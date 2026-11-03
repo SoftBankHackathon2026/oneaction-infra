@@ -12,15 +12,27 @@
 
 ## 인증과 실행
 
-각 팀원은 IAM Identity Center 프로필로 로그인합니다.
+각 팀원은 `aws login`으로 로그인합니다. 이 저장소가 고정한 AWS provider 5.x는 `aws login` 세션을 직접 읽지
+못합니다(provider 6.x, Terraform 1.15 이상의 S3 backend는 읽음). 그래서 Terraform 전용 프로필을 하나 두고
+`credential_process`로 연결합니다. SDK가 만료 시점마다 자격증명을 다시 받아 오므로 긴 apply 중에도 끊기지 않습니다.
+
+`~/.aws/config`에 한 번만 추가합니다. `aws login`이 쓰는 프로필(`<profile>`)에는 `credential_process`를 넣지 않습니다.
+
+```ini
+[profile <profile>-tf]
+region = ap-northeast-2
+credential_process = aws configure export-credentials --profile <profile> --format process
+```
 
 ```bash
 aws login --profile <profile>          # 리전은 ap-northeast-2
-# Terraform AWS provider 5.x 는 aws login 세션을 직접 읽지 못한다. 임시 자격증명을 환경변수로 넘긴다.
-eval "$(aws configure export-credentials --profile <profile> --format env)"
-export AWS_REGION=ap-northeast-2
+export AWS_PROFILE=<profile>-tf AWS_REGION=ap-northeast-2
 aws sts get-caller-identity --query Account --output text   # 974402993422 여야 한다
 ```
+
+`eval "$(aws configure export-credentials ... --format env)"`로 환경변수에 넣는 방식은 쓰지 않습니다. 그 값은 약 15분 뒤
+만료되고 갱신되지 않아서, 20~30분 걸리는 EKS·MSK 적용이 중간에 실패할 수 있습니다.
+IAM Identity Center 시작 URL을 쓰는 `aws configure sso` 프로필도 provider 5.x가 직접 읽으므로 그 방식을 써도 됩니다.
 
 각 스택에서 다음 순서로 실행합니다.
 
