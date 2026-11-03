@@ -16,7 +16,7 @@ function Get-NotificationsOutputs {
 function Get-NotificationsManifests {
     param([string]$Directory, [string]$PythonCommand)
     $pins = Get-Content -LiteralPath (Join-Path $EsoStack 'notifications-artifacts.json') -Raw | ConvertFrom-Json
-    if ($pins.repository -ne 'Crystal-SBHackathon2026/gitops' -or $pins.revision -notmatch '^[a-f0-9]{40}$') { throw 'Unexpected Notifications manifest source.' }
+    if ($pins.repository -ne 'SoftBankHackathon2026/gitops' -or $pins.revision -notmatch '^[a-f0-9]{40}$') { throw 'Unexpected Notifications manifest source.' }
     $directoryPath = Join-Path $Directory "notifications/$($pins.revision)"
     New-Item -ItemType Directory -Path $directoryPath -Force | Out-Null
     $paths = @()

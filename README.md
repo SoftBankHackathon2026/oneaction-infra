@@ -75,3 +75,16 @@ EKS 관련 스택의 상세 절차와 변수는 각 디렉터리의 README를 �
 ## 기술 스택
 
 Terraform 1.5.7 · AWS provider 5.x · Amazon EKS · RDS for PostgreSQL · Amazon MSK · ALB · Route 53 · ACM · S3 · Secrets Manager · CloudWatch · External Secrets Operator · AWS Load Balancer Controller · Argo CD
+
+## 현재 작업 환경과 미확인 입력
+
+Notifications manifest의 source pin은 `SoftBankHackathon2026/gitops`의 확인한 커밋으로 갱신했고 파일 hash와 검증 코드도 맞췄다.
+
+이 저장소의 `123456789012`, 상태 버킷, 예시 Secret ARN은 공개용 예시값이다. 실제 AWS 계정·리소스가 조회되지 않은 상태에서 이름만 추측해 교체하지 않는다. 이번 확인에서 default 프로필은 자격증명이 없고 onetatchi 프로필은 SSO가 만료됐다. 실제 환경 준비에는 다음 입력이 필요하다.
+
+1. 사용할 AWS 프로필과 STS 계정 확인.
+2. 이미 존재하거나 별도로 준비한 Terraform 상태 버킷·잠금 테이블 이름과 권한.
+3. 현재 네트워크·EKS·RDS·MSK 상태 및 remote-state output.
+4. 실제 Secrets Manager ARN과 필요한 키 접근 권한. 비밀값을 코드에 기록하지 않는다.
+
+로그인과 조회 후 해당 스택·검증 스크립트·예제 설정의 계정 및 리소스 참조를 함께 맞춘다. 이번 변경은 Terraform apply나 상태 이전을 수행하지 않았다. 공유 MSK의 기본 파티션 수는 유지하고, CDC 데이터 토픽은 gitops의 `scripts/create-migration-topic.sh`로 별도 생성·검증한다.
