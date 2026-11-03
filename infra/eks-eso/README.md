@@ -8,7 +8,7 @@
 
 | 항목 | 값 |
 | --- | --- |
-| 계정 / 작업 리전 / 클러스터 | `123456789012` / `ap-northeast-2` / `oneaction` |
+| 계정 / 작업 리전 / 클러스터 | `974402993422` / `ap-northeast-2` / `oneaction` |
 | Terraform 상태 | `dev/eks-eso/terraform.tfstate` |
 | 참조 상태 | `dev/eks/terraform.tfstate`, `dev/database/terraform.tfstate` |
 | IAM 역할 / 인라인 정책 | `oneaction-external-secrets` / `read-review-db-secret`, `read-gitops-token-secret`, `read-review-service-secret` |
@@ -35,7 +35,7 @@
 
 IAM trust는 `pods.eks.amazonaws.com`의 `sts:AssumeRole`, `sts:TagSession`과 아래 세 [요청 세션 태그](https://docs.aws.amazon.com/eks/latest/userguide/pod-id-abac.html)를 정확히 제한합니다.
 
-- 클러스터 ARN: `arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction`
+- 클러스터 ARN: `arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction`
 - namespace: `external-secrets`
 - ServiceAccount: `external-secrets`
 
@@ -43,9 +43,9 @@ IAM trust는 `pods.eks.amazonaws.com`의 `sts:AssumeRole`, `sts:TagSession`과 �
 
 현재 Secret은 AWS 관리형 키를 사용하여 별도 `kms:Decrypt` 권한을 추가하지 않았습니다. Terraform은 Secret 메타데이터만 읽고 `aws_secretsmanager_secret_version`을 사용하지 않습니다. customer-managed KMS key가 감지되면 plan을 중단하며, 해당 키의 복호화 권한은 별도로 검토합니다.
 
-GitOps 토큰 Secret의 추가 읽기는 별도 `read-gitops-token-secret` 정책으로 적용·검증했습니다. `gitops_token_secret_arn` 기본값에는 확인한 `oneaction/gitops-token`의 전체 ARN을 반영했습니다. 기존 RDS 정책을 유지하고 토큰 Secret ARN 한 개에만 같은 읽기 API를 허용합니다. 정책 검사에도 `--gitops-token-secret-arn`으로 확인한 ARN을 전달합니다. 토큰 값·GitHub 접근 권한·worker 연결은 앱/GitOps 담당 구성입니다.
+GitOps 토큰 Secret의 추가 읽기는 별도 `read-gitops-token-secret` 정책으로 적용·검증했습니다. `gitops_token_secret_arn`은 기본값이 없으며 `secrets` 스택 출력의 `oneaction/gitops-token` 전체 ARN을 넘깁니다. 기존 RDS 정책을 유지하고 토큰 Secret ARN 한 개에만 같은 읽기 API를 허용합니다. 정책 검사에도 `--gitops-token-secret-arn`으로 확인한 ARN을 전달합니다. 토큰 값·GitHub 접근 권한·worker 연결은 앱/GitOps 담당 구성입니다.
 
-Claude Secret은 `read-review-service-secret` 정책으로 추가합니다. 연결 예시는 팀 메인 페이지의 결과 보고서 아래 review-service Secret 연결 가이드 — Notion에 정리합니다. `review_service_secret_arn`에는 확인한 `oneaction/review-service`의 전체 ARN 한 개를 사용하고, 검사에도 `--review-service-secret-arn`을 전달합니다. 기존 역할·두 정책·Pod Identity와 namespace RBAC를 유지합니다. 영구 `review-service-secrets` ExternalSecret과 worker 연결은 앱/GitOps 담당 구성입니다.
+Claude Secret은 `read-review-service-secret` 정책으로 추가합니다. 연결 예시는 팀 메인 페이지의 결과 보고서 아래 review-service Secret 연결 가이드 — Notion에 정리합니다. `review_service_secret_arn`에는 `secrets` 스택 출력의 `oneaction/review-service` 전체 ARN 한 개를 넘기고, 검사에도 `--review-service-secret-arn`을 전달합니다. 기존 역할·두 정책·Pod Identity와 namespace RBAC를 유지합니다. 영구 `review-service-secrets` ExternalSecret과 worker 연결은 앱/GitOps 담당 구성입니다.
 
 ## Kubernetes 권한과 필수 post-renderer
 
@@ -63,7 +63,9 @@ Operator의 Secret 권한은 `platform` Role로 제한합니다. ClusterSecretSt
 terraform '-chdir=infra/eks-eso' init '-backend-config=../backend.hcl' '-lockfile=readonly'
 terraform '-chdir=infra/eks-eso' fmt -check
 terraform '-chdir=infra/eks-eso' validate
-terraform '-chdir=infra/eks-eso' plan '-out=eso.tfplan'
+$gitopsSecretArn = terraform '-chdir=infra/secrets' output -raw gitops_token_secret_arn
+$reviewSecretArn = terraform '-chdir=infra/secrets' output -raw review_service_secret_arn
+terraform '-chdir=infra/eks-eso' plan '-out=eso.tfplan' "-var=gitops_token_secret_arn=$gitopsSecretArn" "-var=review_service_secret_arn=$reviewSecretArn"
 if ($LASTEXITCODE -ne 0) { throw 'plan 실패' }
 $plan = terraform '-chdir=infra/eks-eso' show -json eso.tfplan
 if ($LASTEXITCODE -ne 0) { throw 'plan JSON 조회 실패' }
@@ -72,8 +74,6 @@ if ($LASTEXITCODE -ne 0) { throw 'plan JSON 조회 실패' }
 python -m venv infra/eks-eso/.venv
 $python = (Resolve-Path infra/eks-eso/.venv/Scripts/python.exe).Path
 & $python -m pip install -r infra/eks-eso/requirements-dev.txt
-$gitopsSecretArn = 'arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/gitops-token-AbCdEf'
-$reviewSecretArn = 'arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-GhIjKl'
 & $python infra/eks-eso/scripts/check_plan.py infra/eks-eso/eso.tfplan.json --gitops-token-secret-arn $gitopsSecretArn --review-service-secret-arn $reviewSecretArn --negative
 if ($LASTEXITCODE -ne 0) { throw '계획 안전성 검사 실패' }
 $artifacts = Join-Path (Get-Location) 'infra/eks-eso/artifacts'

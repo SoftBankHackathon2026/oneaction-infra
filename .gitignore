@@ -9,3 +9,6 @@ crash.log
 !example.auto.tfvars
 
 __pycache__/
+tfplan
+.terraform.lock.hcl.bak
+.DS_Store

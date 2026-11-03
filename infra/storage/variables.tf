@@ -10,7 +10,7 @@ variable "aws_region" {
 
 variable "account_id" {
   type    = string
-  default = "123456789012"
+  default = "974402993422"
 }
 
 variable "owner" {

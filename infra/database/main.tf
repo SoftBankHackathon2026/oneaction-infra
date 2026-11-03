@@ -1,6 +1,7 @@
 provider "aws" {
-  profile = var.aws_profile == "" ? null : var.aws_profile
-  region  = var.aws_region
+  profile             = var.aws_profile == "" ? null : var.aws_profile
+  region              = var.aws_region
+  allowed_account_ids = ["974402993422"]
 
   default_tags {
     tags = {
@@ -14,7 +15,7 @@ provider "aws" {
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     key            = "dev/network/terraform.tfstate"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
@@ -50,7 +51,7 @@ resource "aws_db_instance" "review" {
   identifier = "oneaction-review-db"
 
   engine         = "postgres"
-  engine_version = "16.15"
+  engine_version = "16" # 메이저만 고정. auto_minor_version_upgrade 로 AWS 가 올린 마이너를 되돌리려 하지 않는다
   instance_class = "db.t4g.micro"
 
   allocated_storage     = 20
@@ -69,9 +70,10 @@ resource "aws_db_instance" "review" {
   publicly_accessible    = false
   multi_az               = false
 
-  backup_retention_period = 1
-  deletion_protection     = false
-  skip_final_snapshot     = true
+  backup_retention_period   = var.backup_retention_period
+  deletion_protection       = var.deletion_protection
+  skip_final_snapshot       = var.skip_final_snapshot
+  final_snapshot_identifier = var.skip_final_snapshot ? null : "oneaction-review-db-final"
 
   enabled_cloudwatch_logs_exports = ["postgresql"]
   auto_minor_version_upgrade      = true

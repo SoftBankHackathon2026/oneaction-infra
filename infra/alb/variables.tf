@@ -30,3 +30,9 @@ variable "domain_name" {
   type        = string
   default     = ""
 }
+
+variable "app_subdomain" {
+  description = "Label for the platform record under domain_name. Empty string puts the alias on domain_name itself, which avoids app.app.<domain> when the delegated zone is already app.<domain>."
+  type        = string
+  default     = "app"
+}

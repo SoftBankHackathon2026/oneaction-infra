@@ -1,0 +1,13 @@
+# gitops argocd/monitoring-aws.yaml 의 Prometheus·Grafana 가 쓰는 StorageClass.
+# 기존 계정에서 손으로 만든 것과 같은 설정: gp3, Retain(차트를 지워도 데이터 보존), 암호화.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: oneaction-monitoring-gp3
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  encrypted: "true"
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true

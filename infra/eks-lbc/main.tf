@@ -17,14 +17,14 @@ variable "owner" {
 provider "aws" {
   profile             = var.aws_profile == "" ? null : var.aws_profile
   region              = var.aws_region
-  allowed_account_ids = ["123456789012"]
+  allowed_account_ids = ["974402993422"]
   default_tags {
     tags = { Project = "oneaction", Owner = var.owner, Env = "dev" }
   }
 }
 locals {
   state_config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
     encrypt        = true
@@ -70,10 +70,10 @@ locals {
     # CreateSecurityGroup authorizes both the destination VPC and the new SG.
     # ec2:Vpc is not a supported condition key for this creation action.
     Resource = contains(statement.Action, "ec2:CreateSecurityGroup") ? [
-      "arn:aws:ec2:${var.aws_region}:123456789012:vpc/${local.vpc_id}",
-      "arn:aws:ec2:${var.aws_region}:123456789012:security-group/*"
+      "arn:aws:ec2:${var.aws_region}:974402993422:vpc/${local.vpc_id}",
+      "arn:aws:ec2:${var.aws_region}:974402993422:security-group/*"
       ] : [for resource in flatten([statement.Resource]) :
-      replace(replace(resource, "arn:aws:ec2:*:*:", "arn:aws:ec2:${var.aws_region}:123456789012:"), "arn:aws:elasticloadbalancing:*:*:", "arn:aws:elasticloadbalancing:${var.aws_region}:123456789012:")
+      replace(replace(resource, "arn:aws:ec2:*:*:", "arn:aws:ec2:${var.aws_region}:974402993422:"), "arn:aws:elasticloadbalancing:*:*:", "arn:aws:elasticloadbalancing:${var.aws_region}:974402993422:")
     ]
     Condition = merge(try(statement.Condition, {}), {
       StringEquals = merge(try(statement.Condition.StringEquals, {}),
@@ -82,7 +82,7 @@ locals {
         alltrue([for action in statement.Action : can(regex("^(ec2|elasticloadbalancing):", action))]) ? { "aws:RequestedRegion" = var.aws_region } : {}
       )
       }, length([for action in statement.Action : action if contains(["ec2:AuthorizeSecurityGroupIngress", "ec2:RevokeSecurityGroupIngress", "ec2:DeleteSecurityGroup"], action)]) > 0 ? {
-      ArnEquals = { "ec2:Vpc" = "arn:aws:ec2:${var.aws_region}:123456789012:vpc/${local.vpc_id}" }
+      ArnEquals = { "ec2:Vpc" = "arn:aws:ec2:${var.aws_region}:974402993422:vpc/${local.vpc_id}" }
     } : {})
   })]
 }

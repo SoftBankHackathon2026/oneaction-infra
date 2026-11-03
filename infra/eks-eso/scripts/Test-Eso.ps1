@@ -41,10 +41,10 @@ try {
     Invoke-EsoNative 'kubectl' ($operator + @('wait','--for=condition=Ready',"pod/$identityName",'--timeout=180s'))
     $exec = $operator + @('exec',$identityName,'--','aws')
     $identity = (Invoke-EsoNative 'kubectl' ($exec + @('sts','get-caller-identity','--region','ap-northeast-2','--output','json'))) -join "`n" | ConvertFrom-Json
-    if ($identity.Account -ne '123456789012' -or $identity.Arn -notlike 'arn:aws:sts::123456789012:assumed-role/oneaction-external-secrets/*') { throw 'Pod did not use the dedicated ESO role.' }
+    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/oneaction-external-secrets/*') { throw 'Pod did not use the dedicated ESO role.' }
     Invoke-EsoNative 'kubectl' ($exec + @('secretsmanager','describe-secret','--secret-id',$outputs.secret_arn,'--region','ap-northeast-2','--query','OwningService','--output','text')) | Out-Null
     if ($outputs.gitops_token_secret_arn) {
-        if ($outputs.gitops_token_secret_arn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:[A-Za-z0-9/_+=.@-]+-[A-Za-z0-9]{6}$' -or $outputs.gitops_token_secret_arn -eq $outputs.secret_arn) { throw 'Unexpected GitOps token Secret ARN.' }
+        if ($outputs.gitops_token_secret_arn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:[A-Za-z0-9/_+=.@-]+-[A-Za-z0-9]{6}$' -or $outputs.gitops_token_secret_arn -eq $outputs.secret_arn) { throw 'Unexpected GitOps token Secret ARN.' }
         $gitopsMetadata = (Invoke-EsoNative 'kubectl' ($exec + @('secretsmanager','describe-secret','--secret-id',$outputs.gitops_token_secret_arn,'--region','ap-northeast-2','--query','{ARN:ARN,KmsKeyId:KmsKeyId}','--output','json'))) -join "`n" | ConvertFrom-Json
         if ($gitopsMetadata.ARN -ne $outputs.gitops_token_secret_arn -or $gitopsMetadata.KmsKeyId) { throw 'Unexpected GitOps Secret metadata.' }
         # Only ARN/version metadata leaves the AWS CLI process; never print or save the token.
@@ -54,7 +54,7 @@ try {
     }
     if ($outputs.review_service_secret_arn) {
         $reviewArn = $outputs.review_service_secret_arn
-        if ($reviewArn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-[A-Za-z0-9]{6}$') { throw 'Unexpected review-service Secret ARN.' }
+        if ($reviewArn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-[A-Za-z0-9]{6}$') { throw 'Unexpected review-service Secret ARN.' }
         $reviewMetadata = (Invoke-EsoNative 'kubectl' ($exec + @('secretsmanager','describe-secret','--secret-id',$reviewArn,'--region','ap-northeast-2','--query','{ARN:ARN,KmsKeyId:KmsKeyId}','--output','json'))) -join "`n" | ConvertFrom-Json
         if ($reviewMetadata.ARN -ne $reviewArn -or $reviewMetadata.KmsKeyId) { throw 'Unexpected review-service Secret metadata.' }
         # The CLI selects only version metadata. The API key never leaves the Pod.
@@ -92,7 +92,7 @@ try {
         if ($reviewLog.Trim() -ne 'PASS: workload consumes the synchronized Claude API key.') { throw 'Claude Secret consumer did not return the expected success marker.' }
         Write-Output $reviewLog
     }
-    $denied = 'if result=$(aws secretsmanager describe-secret --secret-id arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:eso-denied-test-123456 --region ap-northeast-2 2>&1); then exit 1; else case "$result" in *AccessDenied*) echo "PASS: other Secret access denied." ;; *) echo "Unexpected denial result"; exit 1 ;; esac; fi'
+    $denied = 'if result=$(aws secretsmanager describe-secret --secret-id arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:eso-denied-test-123456 --region ap-northeast-2 2>&1); then exit 1; else case "$result" in *AccessDenied*) echo "PASS: other Secret access denied." ;; *) echo "Unexpected denial result"; exit 1 ;; esac; fi'
     Invoke-EsoNative 'kubectl' ($operator + @('exec',$identityName,'--','/bin/sh','-c',$denied))
     Write-Output 'PASS: real Pod Identity STS role and allowed Secret metadata read.'
     Write-EsoSyncManifest -SecretArn $outputs.secret_arn -Path $manifest

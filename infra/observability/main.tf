@@ -1,6 +1,7 @@
 provider "aws" {
-  profile = var.aws_profile == "" ? null : var.aws_profile
-  region  = var.aws_region
+  profile             = var.aws_profile == "" ? null : var.aws_profile
+  region              = var.aws_region
+  allowed_account_ids = ["974402993422"]
 
   default_tags {
     tags = {
@@ -14,7 +15,7 @@ provider "aws" {
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     key            = "dev/network/terraform.tfstate"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
@@ -25,7 +26,7 @@ data "terraform_remote_state" "network" {
 data "terraform_remote_state" "alb" {
   backend = "s3"
   config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     key            = "dev/alb/terraform.tfstate"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"

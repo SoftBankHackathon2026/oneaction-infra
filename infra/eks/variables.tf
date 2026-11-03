@@ -50,9 +50,9 @@ variable "admin_principal_arns" {
   validation {
     condition = length(var.admin_principal_arns) > 0 && alltrue([
       for arn in var.admin_principal_arns :
-      can(regex("^arn:aws:iam::123456789012:role/.+$", arn))
+      can(regex("^arn:aws:iam::974402993422:role/.+$", arn))
     ])
-    error_message = "Supply existing IAM role ARNs in team account 123456789012. STS assumed-role and root ARNs are not accepted."
+    error_message = "Supply existing IAM role ARNs in team account 974402993422. STS assumed-role and root ARNs are not accepted."
   }
 }
 

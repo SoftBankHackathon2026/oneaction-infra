@@ -1,6 +1,7 @@
 provider "aws" {
-  profile = var.aws_profile == "" ? null : var.aws_profile
-  region  = var.aws_region
+  profile             = var.aws_profile == "" ? null : var.aws_profile
+  region              = var.aws_region
+  allowed_account_ids = ["974402993422"]
 
   default_tags {
     tags = {
@@ -12,9 +13,10 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias   = "us_east_1"
-  profile = var.aws_profile == "" ? null : var.aws_profile
-  region  = "us-east-1"
+  alias               = "us_east_1"
+  profile             = var.aws_profile == "" ? null : var.aws_profile
+  region              = "us-east-1"
+  allowed_account_ids = ["974402993422"]
 
   default_tags {
     tags = {

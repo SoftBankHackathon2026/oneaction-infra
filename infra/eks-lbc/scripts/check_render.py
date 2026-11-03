@@ -36,7 +36,7 @@ else:
     assert container['resources']['requests'] == {'cpu': '50m', 'memory': '128Mi'}
     assert container['resources']['limits'] == {'cpu': '250m', 'memory': '256Mi'}
     sa = next(d for d in docs if d['kind'] == 'ServiceAccount')
-    assert sa['metadata']['annotations']['eks.amazonaws.com/role-arn'] == 'arn:aws:iam::123456789012:role/oneaction-aws-load-balancer-controller'
+    assert sa['metadata']['annotations']['eks.amazonaws.com/role-arn'] == 'arn:aws:iam::974402993422:role/oneaction-aws-load-balancer-controller'
     crds = [d for d in docs if d['kind'] == 'CustomResourceDefinition']
     assert any(d['metadata']['name'] == 'targetgroupbindings.elbv2.k8s.aws' for d in crds)
     assert any(d['kind'] == 'ValidatingWebhookConfiguration' for d in docs)

@@ -2,7 +2,7 @@
 
 oneaction 서비스의 AWS 인프라를 정의한 Terraform 코드입니다. 네트워크부터 EKS, 데이터 계층, 시크릿 동기화까지 스택 단위로 나눠 관리하며, 애플리케이션 배포는 별도 GitOps 저장소의 Argo CD가 담당합니다.
 
-> 공개용 저장소입니다. AWS 계정 ID·Secret ARN·리소스 주소는 예시값(`123456789012` 등)으로 바꿨고, 운영 기록 문서는 제외했습니다.
+> 배포 대상은 팀 계정 `974402993422`(t3underline), 서울 리전입니다. 모든 스택이 이 계정 밖에서의 실행을 거부합니다. 운영 기록 문서는 제외했습니다.
 
 ## 아키텍처
 
@@ -35,18 +35,20 @@ flowchart LR
 | --- | --- | --- |
 | 1 | [`network`](infra/network) | VPC, public·EKS·data 서브넷(2 AZ), NAT Gateway, S3 Gateway Endpoint, ALB·RDS·노드 보안그룹 |
 | 2 | [`storage`](infra/storage) | 리뷰 문서 버킷(버전 관리·암호화), 로그 버킷(수명 주기), 퍼블릭 접근 차단 |
-| 3 | [`dns`](infra/dns) | Route 53 호스팅 영역, ACM 인증서, CAA 레코드, 쿼리 로그 |
-| 4 | [`database`](infra/database) | RDS PostgreSQL 16 (`db.t4g.micro`, 암호화, 마스터 비밀번호는 Secrets Manager 관리) |
-| 5 | [`alb`](infra/alb) | ALB, HTTP/HTTPS 리스너, 플랫폼 대상 그룹 |
-| 6 | [`observability`](infra/observability) | VPC Flow Logs, EKS 로그 그룹, RDS·ALB·NAT 알람, SNS 알림 |
-| 7 | [`eks`](infra/eks) | EKS 클러스터, Launch Template 기반 Node Group, OIDC, VPC CNI 전용 IRSA, Access Entry |
-| 8 | [`eks-lbc`](infra/eks-lbc) | AWS Load Balancer Controller용 IRSA 역할·정책, Helm values |
-| 9 | [`eks-eso`](infra/eks-eso) | External Secrets Operator용 Pod Identity, Secret별 최소 읽기 정책 |
-| 10 | [`msk`](infra/msk) | MSK Kafka 클러스터(`kafka.t3.small` × 2), EKS 서브넷에서만 허용하는 보안그룹 |
+| 3 | [`secrets`](infra/secrets) | `oneaction/review-service`, `oneaction/gitops-token` Secret 그릇 (값은 Terraform 밖에서 넣음) |
+| 4 | [`dns`](infra/dns) | Route 53 호스팅 영역, ACM 인증서, CAA 레코드, 쿼리 로그 |
+| 5 | [`database`](infra/database) | RDS PostgreSQL 16 (`db.t4g.micro`, 암호화, 마스터 비밀번호는 Secrets Manager 관리) |
+| 6 | [`alb`](infra/alb) | ALB, HTTP/HTTPS 리스너, 플랫폼 대상 그룹 |
+| 7 | [`observability`](infra/observability) | VPC Flow Logs, EKS 로그 그룹, RDS·ALB·NAT 알람, SNS 알림 |
+| 8 | [`eks`](infra/eks) | EKS 클러스터, Launch Template 기반 Node Group, OIDC, VPC CNI 전용 IRSA, Access Entry |
+| 9 | [`eks-ebs-csi`](infra/eks-ebs-csi) | EBS CSI 드라이버 애드온·Pod Identity, 모니터링용 `oneaction-monitoring-gp3` StorageClass |
+| 10 | [`eks-lbc`](infra/eks-lbc) | AWS Load Balancer Controller용 IRSA 역할·정책, Helm values |
+| 11 | [`eks-eso`](infra/eks-eso) | External Secrets Operator용 Pod Identity, Secret별 최소 읽기 정책 |
+| 12 | [`msk`](infra/msk) | MSK Kafka 클러스터(`kafka.t3.small` × 2), EKS 서브넷에서만 허용하는 보안그룹 |
 
 ## 설계 포인트
 
-- **스택 분리**: 변경 범위와 장애 영향을 줄이기 위해 리소스 수명 주기별로 상태를 나눴습니다. EKS 애드온(LBC, ESO)도 클러스터 스택과 분리했습니다.
+- **스택 분리**: 변경 범위와 장애 영향을 줄이기 위해 리소스 수명 주기별로 상태를 나눴습니다. EKS 애드온(EBS CSI, LBC, ESO)도 클러스터 스택과 분리했습니다.
 - **최소 권한**: LBC는 IRSA, ESO는 EKS Pod Identity를 사용하고 읽을 수 있는 Secret을 ARN 단위로 제한합니다. Argo CD Notifications도 전용 역할을 따로 둡니다.
 - **시크릿은 코드 밖에**: RDS 비밀번호, GitOps 토큰, API 키는 Secrets Manager에만 저장하고 ESO가 Kubernetes Secret으로 동기화합니다. Terraform은 Secret 메타데이터만 조회합니다.
 - **네트워크 격리**: RDS와 MSK는 data 서브넷에 두고, EKS 서브넷 CIDR에서만 접근을 허용합니다. EKS API의 퍼블릭 엔드포인트는 `/32` allowlist로 제한합니다.
@@ -76,15 +78,9 @@ EKS 관련 스택의 상세 절차와 변수는 각 디렉터리의 README를 �
 
 Terraform 1.5.7 · AWS provider 5.x · Amazon EKS · RDS for PostgreSQL · Amazon MSK · ALB · Route 53 · ACM · S3 · Secrets Manager · CloudWatch · External Secrets Operator · AWS Load Balancer Controller · Argo CD
 
-## 현재 작업 환경과 미확인 입력
+## 배포 준비 상태
 
-Notifications manifest의 source pin은 `SoftBankHackathon2026/gitops`의 확인한 커밋으로 갱신했고 파일 hash와 검증 코드도 맞췄다.
+2026-11-04 기준 계정 `974402993422`는 비어 있고 상태 버킷·잠금 테이블만 있습니다. 빈 계정 기준 적용 순서와
+Terraform 밖의 설치 작업은 [infra/README.md](infra/README.md)에 정리했습니다.
 
-이 저장소의 `123456789012`, 상태 버킷, 예시 Secret ARN은 공개용 예시값이다. 실제 AWS 계정·리소스가 조회되지 않은 상태에서 이름만 추측해 교체하지 않는다. 이번 확인에서 default 프로필은 자격증명이 없고 onetatchi 프로필은 SSO가 만료됐다. 실제 환경 준비에는 다음 입력이 필요하다.
-
-1. 사용할 AWS 프로필과 STS 계정 확인.
-2. 이미 존재하거나 별도로 준비한 Terraform 상태 버킷·잠금 테이블 이름과 권한.
-3. 현재 네트워크·EKS·RDS·MSK 상태 및 remote-state output.
-4. 실제 Secrets Manager ARN과 필요한 키 접근 권한. 비밀값을 코드에 기록하지 않는다.
-
-로그인과 조회 후 해당 스택·검증 스크립트·예제 설정의 계정 및 리소스 참조를 함께 맞춘다. 이번 변경은 Terraform apply나 상태 이전을 수행하지 않았다. 공유 MSK의 기본 파티션 수는 유지하고, CDC 데이터 토픽은 gitops의 `scripts/create-migration-topic.sh`로 별도 생성·검증한다.
+공유 MSK의 기본 파티션 수는 유지하고, CDC 데이터 토픽은 gitops의 `scripts/create-migration-topic.sh`로 별도 생성·검증합니다.

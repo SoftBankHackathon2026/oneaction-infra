@@ -1,13 +1,12 @@
 variable "gitops_token_secret_arn" {
-  description = "Full ARN of the existing GitOps token Secret. Null leaves its read permission disabled."
+  description = "Full ARN of oneaction/gitops-token from the secrets stack output. Pass null explicitly to disable its read permission."
   type        = string
-  default     = "arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/gitops-token-AbCdEf"
   validation {
     condition = var.gitops_token_secret_arn == null ? true : can(regex(
-      "^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:[A-Za-z0-9/_+=.@-]+-[A-Za-z0-9]{6}$",
+      "^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:[A-Za-z0-9/_+=.@-]+-[A-Za-z0-9]{6}$",
       var.gitops_token_secret_arn
     ))
-    error_message = "Use one full Secret ARN in team account 123456789012 and Seoul, without wildcards."
+    error_message = "Use one full Secret ARN in team account 974402993422 and Seoul, without wildcards."
   }
 }
 

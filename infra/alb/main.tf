@@ -1,6 +1,7 @@
 provider "aws" {
-  profile = var.aws_profile == "" ? null : var.aws_profile
-  region  = var.aws_region
+  profile             = var.aws_profile == "" ? null : var.aws_profile
+  region              = var.aws_region
+  allowed_account_ids = ["974402993422"]
 
   default_tags {
     tags = {
@@ -13,7 +14,7 @@ provider "aws" {
 
 locals {
   state_config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
     encrypt        = true
@@ -109,7 +110,7 @@ resource "aws_route53_record" "app" {
   count = var.hosted_zone_id != "" && var.domain_name != "" ? 1 : 0
 
   zone_id = var.hosted_zone_id
-  name    = "app.${var.domain_name}"
+  name    = var.app_subdomain == "" ? var.domain_name : "${var.app_subdomain}.${var.domain_name}"
   type    = "A"
 
   alias {
