@@ -43,6 +43,7 @@ flowchart LR
 | 8 | [`eks-lbc`](infra/eks-lbc) | AWS Load Balancer Controller용 IRSA 역할·정책, Helm values |
 | 9 | [`eks-eso`](infra/eks-eso) | External Secrets Operator용 Pod Identity, Secret별 최소 읽기 정책 |
 | 10 | [`msk`](infra/msk) | MSK Kafka 클러스터(`kafka.t3.small` × 2), EKS 서브넷에서만 허용하는 보안그룹 |
+| 11 | [`tailscale`](infra/tailscale) | Tailscale 서브넷 라우터(`t4g.nano`, EKS private 서브넷). 온프렘 k3s 가 tailnet 으로 RDS·MSK 에 닿는 경로 |
 
 ## 설계 포인트
 
