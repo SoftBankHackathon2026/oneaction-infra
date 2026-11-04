@@ -88,3 +88,10 @@ Notifications manifest의 source pin은 `SoftBankHackathon2026/gitops`의 확인
 4. 실제 Secrets Manager ARN과 필요한 키 접근 권한. 비밀값을 코드에 기록하지 않는다.
 
 로그인과 조회 후 해당 스택·검증 스크립트·예제 설정의 계정 및 리소스 참조를 함께 맞춘다. 이번 변경은 Terraform apply나 상태 이전을 수행하지 않았다. 공유 MSK의 기본 파티션 수는 유지하고, CDC 데이터 토픽은 gitops의 `scripts/create-migration-topic.sh`로 별도 생성·검증한다.
+
+## GCP 대응 환경
+
+- 기존 AWS 구성은 유지하고 GCP 진입점은 별도로 추가했습니다.
+- [GCP 구성·적용 순서·AWS와의 차이](infra/gcp/README.md)에서 확인합니다.
+- 프로젝트·리전·환경을 변수로 설정하며 상태는 Cloud Storage에 별도로 저장합니다.
+- 실제 클라우드 적용과 데이터 이전은 수행하지 않았습니다.

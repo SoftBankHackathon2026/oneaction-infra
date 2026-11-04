@@ -31,6 +31,7 @@
 - `bootstrap/`: 버전 관리·공개 차단·삭제 보호를 갖춘 상태 저장 버킷. 처음에는 로컬 상태를 사용합니다.
 - `tests/`: 기본 구성, 다른 리전/환경, 도메인, Kafka 제외, 오류 입력, 권한·개별 리소스 계획 시험.
 - GCP 플랫폼은 환경당 상태 1개에서 하위 구성을 연결합니다. 기존 AWS의 구성별 원격 상태를 그대로 복제하면 예시 계정·상태 주소까지 공유하게 되므로 이 구성을 택했습니다.
+- GKE는 같은 프로젝트의 클러스터끼리 Workload Identity 풀과 동일한 namespace/서비스 계정 주체를 공유합니다. 이 구성은 기존 계정 이름을 유지하므로 **개발/운영 간 강한 권한 격리가 필요하면 프로젝트를 분리**합니다. 환경 이름과 상태 prefix만으로 권한이 격리되지는 않습니다.
 - 환경을 새로 만들 때는 작업 폴더와 상태 `prefix`도 분리합니다. 같은 상태에서 `environment`만 바꾸면 기존 리소스의 이름 변경·교체 계획이 생깁니다. AWS 상태를 GCP에 전달하지 않습니다.
 - 가상망 주소는 기존 AWS `10.0.0.0/16`과 겹치지 않게 노드 `10.20.32.0/19`, 데이터 `10.20.10.0/24`, Cloud SQL 예약 `10.20.128.0/20`, Pod `10.24.0.0/14`, Service `10.28.0.0/20`, 제어 영역 `172.20.0.0/28`을 사용합니다. 기존 조직망과의 중복은 적용 전 확인합니다.
 
@@ -116,7 +117,7 @@
 
    - `rendered/workload-patch.yaml`은 `review-api`의 `api` 컨테이너, `worker-patch.yaml`은 `review-worker`의 `worker` 컨테이너에 적용하는 **Kustomize 병합 조각**입니다. 단독 `kubectl apply` 대상이 아닙니다.
    - 서비스 계정은 `platform/review-service`를 사용합니다. Cloud SQL Auth Proxy가 같은 Pod 안에서 `127.0.0.1:5432`를 열고 사설 주소로 암호화·인증하여 연결합니다. 앱의 `DB_SSLMODE=disable`은 Pod 안의 루프백 구간에만 적용됩니다. 프록시를 빼고 사설 DB에 이 값을 사용하면 안 됩니다.
-   - 생성 Service는 기존 `platform:8080`, 선택자는 `app=review-api`입니다. 기존 AWS `TargetGroupBinding`과 AWS 접속 ConfigMap을 GCP에 그대로 적용하지 않습니다.
+   - 생성 Service는 기존 `platform:8080`, 선택자는 `app=review-api`입니다. 기존 AWS `TargetGroupBinding`과 AWS 접속 ConfigMap을 GCP에 그대로 적용하지 않습니다. `KAFKA_BOOTSTRAP`, `DEFAULT_TARGET`, `REVIEW_API_PUBLIC_URL`, `APP_URLS` 등의 AWS 주소도 GCP의 실제 연결값으로 조정해야 합니다.
    - 기존 GitOps에 있는 AWS `review-service-secrets` ExternalSecret 대신 생성된 GCP 설정을 사용합니다. 두 선언이 같은 Kubernetes Secret을 동시에 관리하지 않도록 기존 리소스를 선택적으로 구성합니다.
    - Argo CD와 Argo Rollouts는 기존 GitOps 설치 절차·고정 버전을 재사용할 수 있습니다. 이 저장소는 다른 저장소의 Application 목적지나 자동 동기화를 바꾸지 않습니다.
    - Argo CD Notifications의 `ARGOCD_WEBHOOK_TOKEN`은 기존 Secret에 `Merge`합니다. Argo CD 설치가 `argocd-notifications-secret`을 만든 뒤 동기화됩니다. webhook URL·알림 템플릿은 기존 GitOps에서 GCP용으로 연결해야 합니다.
@@ -141,6 +142,7 @@
 
 - `domain_name`이 비어 있으면 DNS·인증서 없이 HTTP 진입점을 구성합니다. 공개 인증 정보를 HTTP로 전달하지 않으며 공개 운영 전에 소유 도메인과 인증서를 준비합니다.
 - `domain_name`이 있으면 관리 인증서·HTTPS 전환 설정을 생성합니다. 새 Cloud DNS 영역은 `dns_domain` 또는 앱 도메인으로 생성하고 `platform.dns_name_servers`로 네임서버를 확인합니다. 기존 영역이면 `dns_zone_name`을 지정합니다.
+- 기존 도메인을 변경할 때는 인증서가 고정 이름이므로 자동 교체하지 않습니다. 운영자가 먼저 Ingress의 이전 인증서 참조를 해제하고 GKE 프록시에서 제거된 것을 확인한 뒤 Terraform 변경을 적용하고 새 인증서를 다시 연결합니다. 이 구간은 HTTPS 중단이 있으므로 운영 중에는 별도 이름의 인증서를 준비하는 교체 작업으로 분리합니다. Ingress를 제거하지 않고 인증서를 먼저 삭제하면 사용 중 오류가 날 수 있습니다.
 - 인증서가 실제 발급되려면 공개 DNS가 예약 주소를 가리키고 GKE Ingress가 정상 연결되어야 합니다. 생성 계획 통과는 발급 완료를 뜻하지 않습니다.
 - BackendConfig가 로드밸런서 요청 로그를 수집합니다. 오류 알람은 GKE가 생성하는 URL-map 이름에 포함된 `platform/<환경 이름>-platform`을 기준으로 범위를 제한합니다. 실제 적용 후 Cloud Logging에서 이름·로그·시험 오류를 확인합니다.
 - `notification_email`이 없으면 알람 정책만 만들고 이메일 채널은 만들지 않습니다. 수신 여부는 실제 프로젝트에서 확인합니다.
