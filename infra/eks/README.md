@@ -17,7 +17,7 @@
 | 루트 볼륨 | 노드당 암호화 gp3 20GiB |
 | 인스턴스 메타데이터 | IMDSv2 필수, hop limit=1 |
 | CPU 크레딧 | standard: 크레딧 고갈 시 성능 제한, unlimited 추가 요금 방지 |
-| 애드온 | VPC CNI, kube-proxy, CoreDNS, EKS Pod Identity Agent |
+| 애드온 | VPC CNI, kube-proxy, CoreDNS, EKS Pod Identity Agent, EBS CSI 드라이버(Pod Identity, `ebs-csi.tf`) |
 | 접근 권한 | 명시적인 IAM 역할의 EKS access entry; 생성자 자동 관리자 권한 없음 |
 | 로그 | observability 소유 /aws/eks/oneaction/cluster 재사용, 보존 7일, 5종 로그 활성화 |
 
@@ -178,3 +178,14 @@ terraform apply foundation.tfplan
 - [VPC CNI IAM 권한](https://docs.aws.amazon.com/eks/latest/userguide/cni-iam-role.html)
 - [EKS 가격](https://aws.amazon.com/eks/pricing/)
 - [AWS Price List API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html)
+
+## EBS CSI 드라이버와 모니터링 StorageClass
+
+gitops `argocd/monitoring-aws.yaml` 의 Prometheus·Grafana PVC 는 StorageClass `oneaction-monitoring-gp3` 를 쓴다.
+예전 계정에서는 드라이버와 StorageClass 를 손으로 만들었다. 지금은 `ebs-csi.tf` 가 애드온과 Pod Identity 역할을 만들고,
+StorageClass 는 클러스터 생성 뒤 한 번 적용한다.
+
+```bash
+kubectl apply -f infra/eks/manifests/storageclass-monitoring-gp3.yaml
+```
+

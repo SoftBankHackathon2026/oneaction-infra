@@ -1,0 +1,14 @@
+# gitops argocd/monitoring-aws.yaml 의 Prometheus·Grafana PVC 가 쓰는 StorageClass.
+# 모니터링 데이터는 재설치 뒤에도 남기려고 Retain 으로 둔다. EBS CSI 애드온(ebs-csi.tf) 이 있어야 한다.
+#   kubectl apply -f infra/eks/manifests/storageclass-monitoring-gp3.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: oneaction-monitoring-gp3
+provisioner: ebs.csi.aws.com
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+parameters:
+  type: gp3
+  encrypted: "true"
