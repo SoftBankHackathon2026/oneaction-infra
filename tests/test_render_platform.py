@@ -68,6 +68,26 @@ class RenderTests(unittest.TestCase):
         self.assertNotIn('--address=0.0.0.0', proxy['args'])
         self.assertIn(PLATFORM['database']['connection_name'], proxy['args'])
 
+    def test_preserves_existing_review_service_and_notification_contracts(self):
+        docs = renderer.manifests(PLATFORM)
+        service = next(d for d in docs if d['kind'] == 'Service')
+        self.assertEqual(service['metadata']['name'], 'platform')
+        self.assertEqual(service['spec']['selector'], {'app': 'review-api'})
+        notifications = next(d for d in docs if d['kind'] == 'ExternalSecret' and d['metadata']['namespace'] == 'argocd')
+        self.assertEqual(notifications['spec']['target']['creationPolicy'], 'Merge')
+        self.assertEqual(notifications['spec']['data'][0]['secretKey'], 'ARGOCD_WEBHOOK_TOKEN')
+        external = next(d for d in docs if d['kind'] == 'ExternalSecret' and d['metadata']['name'] == 'review-service-secrets')
+        keys = {d['secretKey'] for d in external['spec']['data']}
+        self.assertEqual(keys, {'ANTHROPIC_API_KEY', 'GITHUB_TOKEN', 'GITHUB_WEBHOOK_SECRET', 'ARGOCD_WEBHOOK_TOKEN', 'REVIEW_API_TOKEN'})
+        token = next(d for d in external['spec']['data'] if d['secretKey'] == 'GITHUB_TOKEN')
+        self.assertNotIn('property', token['remoteRef'])
+        patch = renderer.workload_patch(PLATFORM)
+        self.assertEqual(patch['metadata']['name'], 'review-api')
+        app = next(c for c in patch['spec']['template']['spec']['containers'] if c['name'] == 'api')
+        env = {e['name']: e for e in app['env']}
+        self.assertIn('DB_USERNAME', env)
+        self.assertEqual(env['DB_SSLMODE']['value'], 'disable')
+
     def test_rejects_wrong_cloud_and_placeholder_project(self):
         for cloud in ['aws', 'unknown']:
             with self.assertRaises(ValueError): renderer.validate_platform(dict(PLATFORM, cloud=cloud))
