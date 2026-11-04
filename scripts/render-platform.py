@@ -67,11 +67,10 @@ def manifests(platform):
     docs.extend([
         external_secret(platform, 'review-db', 'platform', 'database',
                         {'username': 'username', 'password': 'password'}, 'review-db-credentials'),
-        external_secret(platform, 'gitops-token', 'platform', 'gitops', {'GITHUB_TOKEN': 'GITHUB_TOKEN'}),
         external_secret(platform, 'review-service-secrets', 'platform', 'review_service',
-                        {'ANTHROPIC_API_KEY': 'ANTHROPIC_API_KEY', 'REVIEW_API_TOKEN': 'REVIEW_API_TOKEN'}),
-        external_secret(platform, 'argocd-notifications-secret', 'argocd', 'review_service',
-                        {'review-api-token': 'REVIEW_API_TOKEN'}),
+                        {'ANTHROPIC_API_KEY': 'ANTHROPIC_API_KEY', 'REVIEW_API_TOKEN': 'REVIEW_API_TOKEN', 'GITHUB_WEBHOOK_SECRET': 'GITHUB_WEBHOOK_SECRET', 'ARGOCD_WEBHOOK_TOKEN': 'ARGOCD_WEBHOOK_TOKEN'}),
+        external_secret(platform, 'argocd-notifications', 'argocd', 'review_service',
+                        {'ARGOCD_WEBHOOK_TOKEN': 'ARGOCD_WEBHOOK_TOKEN'}, 'argocd-notifications-secret'),
         resource('v1', 'ServiceAccount', 'review-service', 'platform', annotations={
             'iam.gke.io/gcp-service-account': platform['identities']['workload'],
         }),
@@ -79,18 +78,22 @@ def manifests(platform):
             'healthCheck': {'type': 'HTTP', 'requestPath': '/healthz', 'port': 8080},
             'logging': {'enable': True, 'sampleRate': 1.0},
         }),
-        resource('v1', 'Service', 'review-service', 'platform', {
-            'type': 'ClusterIP', 'selector': {'app': 'review-service'},
-            'ports': [{'name': 'http', 'port': 80, 'targetPort': 8080}],
+        resource('v1', 'Service', 'platform', 'platform', {
+            'type': 'ClusterIP', 'selector': {'app': 'review-api'},
+            'ports': [{'name': 'http', 'port': 8080, 'targetPort': 'http'}],
         }, annotations={
             'cloud.google.com/neg': '{"ingress": true}',
             'cloud.google.com/backend-config': '{"default": "review-service"}',
         }),
     ])
+    review = next(d for d in docs if d['kind'] == 'ExternalSecret' and d['metadata']['name'] == 'review-service-secrets')
+    review['spec']['data'].append({'secretKey': 'GITHUB_TOKEN', 'remoteRef': {'key': platform['secrets']['gitops']}})
+    notifications = next(d for d in docs if d['kind'] == 'ExternalSecret' and d['metadata']['namespace'] == 'argocd')
+    notifications['spec']['target']['creationPolicy'] = 'Merge'
     lb = platform['load_balancer']
     annotations = {'kubernetes.io/ingress.class': 'gce', 'kubernetes.io/ingress.global-static-ip-name': lb['address_name']}
     rule = {'http': {'paths': [{'path': '/', 'pathType': 'Prefix',
-                              'backend': {'service': {'name': 'review-service', 'port': {'number': 80}}}}]}}
+                              'backend': {'service': {'name': 'platform', 'port': {'number': 8080}}}}]}}
     if lb['domain_name']:
         if not lb.get('certificate_name'):
             raise ValueError('A domain requires the managed certificate output.')
@@ -100,21 +103,22 @@ def manifests(platform):
         docs.append(resource('networking.gke.io/v1beta1', 'FrontendConfig', 'review-service', 'platform', {
             'redirectToHttps': {'enabled': True, 'responseCodeName': 'MOVED_PERMANENTLY_DEFAULT'},
         }))
-    docs.append(resource('networking.k8s.io/v1', 'Ingress', 'review-service', 'platform', {'rules': [rule]}, annotations))
+    docs.append(resource('networking.k8s.io/v1', 'Ingress', platform['name'] + '-platform', 'platform', {'rules': [rule]}, annotations))
     return docs
 
 
-def workload_patch(platform):
+def workload_patch(platform, component="api"):
     validate_platform(platform)
-    return resource('apps/v1', 'Deployment', 'review-service', 'platform', {
+    return resource('apps/v1', 'Deployment', 'review-' + component, 'platform', {
         'template': {'spec': {
             'serviceAccountName': 'review-service',
             'containers': [
-                {'name': 'review-service', 'env': [
+                {'name': component, 'env': [
                     {'name': 'DB_HOST', 'value': '127.0.0.1'},
                     {'name': 'DB_PORT', 'value': '5432'},
                     {'name': 'DB_NAME', 'value': platform['database']['name']},
-                    {'name': 'DB_USER', 'valueFrom': {'secretKeyRef': {'name': 'review-db-credentials', 'key': 'username'}}},
+                    {'name': 'DB_SSLMODE', 'value': 'disable'},
+                    {'name': 'DB_USERNAME', 'valueFrom': {'secretKeyRef': {'name': 'review-db-credentials', 'key': 'username'}}},
                     {'name': 'DB_PASSWORD', 'valueFrom': {'secretKeyRef': {'name': 'review-db-credentials', 'key': 'password'}}},
                 ]},
                 {'name': 'cloud-sql-proxy', 'image': 'gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.18.2',
@@ -135,6 +139,7 @@ def render(platform, directory, root=ROOT):
     (directory / 'namespaces.yaml').write_text(yaml.safe_dump_all([d for d in docs if d['kind'] == 'Namespace'], sort_keys=False))
     (directory / 'platform.yaml').write_text(yaml.safe_dump_all([d for d in docs if d['kind'] != 'Namespace'], sort_keys=False))
     (directory / 'workload-patch.yaml').write_text(yaml.safe_dump(workload_patch(platform), sort_keys=False))
+    (directory / 'worker-patch.yaml').write_text(yaml.safe_dump(workload_patch(platform, 'worker'), sort_keys=False))
 
 
 def main():

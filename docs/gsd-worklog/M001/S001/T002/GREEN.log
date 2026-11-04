@@ -1,0 +1,16 @@
+test_every_cluster_mutation_has_the_explicit_gke_context (test_install_platform.InstallTests) ... ok
+test_refuses_an_unrelated_cluster_context (test_install_platform.InstallTests) ... ok
+test_reuses_the_existing_rbac_post_renderer_only_for_the_primary_operator (test_install_platform.InstallTests) ... ok
+test_domain_enables_certificate_and_https_redirect (test_render_platform.RenderTests) ... ok
+test_native_ingress_has_neg_and_matches_healthcheck_port (test_render_platform.RenderTests) ... ok
+test_notifications_keep_their_own_identity_and_scope (test_render_platform.RenderTests) ... ok
+test_preserves_existing_review_service_and_notification_contracts (test_render_platform.RenderTests) ... ok
+test_proxy_is_private_and_uses_workload_identity (test_render_platform.RenderTests) ... ok
+test_rejects_wrong_cloud_and_placeholder_project (test_render_platform.RenderTests) ... ok
+test_reuses_aws_values_without_aws_credentials (test_render_platform.RenderTests) ... ok
+test_store_uses_pod_identity_and_keeps_database_secret_contract (test_render_platform.RenderTests) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.010s
+
+OK
