@@ -11,7 +11,7 @@ function Get-LbcOutputs {
     $raw = (Invoke-LbcNative 'terraform' @("-chdir=$LbcStack", 'output', '-json')) -join "`n" | ConvertFrom-Json
     $values = @{}
     foreach ($property in $raw.PSObject.Properties) { $values[$property.Name] = $property.Value.value }
-    if ($values.cluster_name -ne 'oneaction' -or $values.aws_region -ne 'ap-northeast-2' -or $values.role_arn -ne 'arn:aws:iam::123456789012:role/oneaction-aws-load-balancer-controller' -or $values.vpc_id -notmatch '^vpc-[a-f0-9]+$') {
+    if ($values.cluster_name -ne 'oneaction' -or $values.aws_region -ne 'ap-northeast-2' -or $values.role_arn -ne 'arn:aws:iam::974402993422:role/oneaction-aws-load-balancer-controller' -or $values.vpc_id -notmatch '^vpc-[a-f0-9]+$') {
         throw 'The applied IAM outputs do not match the oneaction deployment.'
     }
     return $values
@@ -19,7 +19,7 @@ function Get-LbcOutputs {
 function New-LbcKubeconfig {
     param([string]$Profile)
     $identity = (Invoke-LbcNative 'aws' @('sts', 'get-caller-identity', '--profile', $Profile, '--region', 'ap-northeast-2', '--output', 'json', '--no-cli-pager')) -join "`n" | ConvertFrom-Json
-    if ($identity.Account -ne '123456789012') { throw 'Use the team account 123456789012.' }
+    if ($identity.Account -ne '974402993422') { throw 'Use the team account 974402993422.' }
     $path = [IO.Path]::GetTempFileName()
     try {
         Invoke-LbcNative 'aws' @('eks', 'update-kubeconfig', '--name', 'oneaction', '--region', 'ap-northeast-2', '--profile', $Profile, '--kubeconfig', $path) | Out-Null

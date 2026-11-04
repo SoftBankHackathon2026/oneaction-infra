@@ -14,7 +14,7 @@ provider "aws" {
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     key            = "dev/network/terraform.tfstate"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"

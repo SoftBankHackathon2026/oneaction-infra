@@ -13,14 +13,14 @@ variable "aws_region" {
 provider "aws" {
   profile             = var.aws_profile == "" ? null : var.aws_profile
   region              = var.aws_region
-  allowed_account_ids = ["123456789012"]
+  allowed_account_ids = ["974402993422"]
   default_tags {
     tags = { Project = "oneaction", Owner = "hyeyeon.kim", Env = "dev" }
   }
 }
 locals {
   state_config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
     encrypt        = true
@@ -70,11 +70,11 @@ resource "aws_iam_role" "eso" {
   assume_role_policy = data.aws_iam_policy_document.trust.json
   lifecycle {
     precondition {
-      condition     = local.cluster_name == "oneaction" && local.cluster_arn == "arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction"
+      condition     = local.cluster_name == "oneaction" && local.cluster_arn == "arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction"
       error_message = "The EKS state must reference the team oneaction cluster."
     }
     precondition {
-      condition     = can(regex("^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:rds!db-", local.secret_arn))
+      condition     = can(regex("^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:rds!db-", local.secret_arn))
       error_message = "Use the existing RDS-managed Secret in the team account and region."
     }
     precondition {

@@ -30,12 +30,12 @@ try {
     Invoke-EsoNative 'kubectl' ($base + @('-n','external-secrets','wait','--for=condition=Ready',"pod/$identityName",'--timeout=180s')) | Out-Host
     $exec = $base + @('-n','external-secrets','exec',$identityName,'--')
     $identity = (Invoke-EsoNative 'kubectl' ($exec + @('aws','sts','get-caller-identity','--region','ap-northeast-2','--output','json'))) -join "`n" | ConvertFrom-Json
-    if ($identity.Account -ne '123456789012' -or $identity.Arn -notlike 'arn:aws:sts::123456789012:assumed-role/oneaction-external-secrets-argocd/*') { throw 'Test Pod did not use the dedicated Notifications role.' }
+    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/oneaction-external-secrets-argocd/*') { throw 'Test Pod did not use the dedicated Notifications role.' }
     $version = (Invoke-EsoNative 'kubectl' ($exec + @('aws','secretsmanager','get-secret-value','--secret-id',$outputs.review_service_secret_arn,'--region','ap-northeast-2','--query','{ARN:ARN,VersionId:VersionId}','--output','json'))) -join "`n" | ConvertFrom-Json
     if ($version.ARN -ne $outputs.review_service_secret_arn -or -not $version.VersionId) { throw 'Notifications source read failed.' }
     foreach ($deniedArn in @($outputs.secret_arn,$outputs.gitops_token_secret_arn)) {
         if (-not $deniedArn) { continue }
-        if ($deniedArn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:[A-Za-z0-9/_+=.@!-]+-[A-Za-z0-9]{6}$') { throw 'Unexpected denial-test Secret ARN.' }
+        if ($deniedArn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:[A-Za-z0-9/_+=.@!-]+-[A-Za-z0-9]{6}$') { throw 'Unexpected denial-test Secret ARN.' }
         $deniedCommand = 'if result=$(aws secretsmanager describe-secret --secret-id "$1" --region ap-northeast-2 2>&1); then exit 1; else case "$result" in *AccessDenied*) echo "PASS: out-of-scope Secret access denied." ;; *) echo "Unexpected denial result"; exit 1 ;; esac; fi'
         Invoke-EsoNative 'kubectl' ($exec + @('/bin/sh','-c',$deniedCommand,'check',$deniedArn)) | Out-Host
     }

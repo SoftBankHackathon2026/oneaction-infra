@@ -23,7 +23,7 @@ try {
             cluster_name = $plan.planned_values.outputs.cluster_name.value
             aws_region = $plan.planned_values.outputs.aws_region.value
             vpc_id = $plan.planned_values.outputs.vpc_id.value
-            role_arn = 'arn:aws:iam::123456789012:role/oneaction-aws-load-balancer-controller'
+            role_arn = 'arn:aws:iam::974402993422:role/oneaction-aws-load-balancer-controller'
         }
     }
     Write-LbcJson (Get-LbcRuntimeValues $outputs) $runtime

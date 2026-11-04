@@ -39,7 +39,7 @@ resource "aws_iam_role" "notifications" {
   assume_role_policy = data.aws_iam_policy_document.notifications_trust[0].json
   lifecycle {
     precondition {
-      condition     = local.cluster_name == "oneaction" && local.cluster_arn == "arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction"
+      condition     = local.cluster_name == "oneaction" && local.cluster_arn == "arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction"
       error_message = "Notifications Pod Identity must use the team oneaction cluster."
     }
     precondition {

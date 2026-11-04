@@ -7,7 +7,7 @@ $oneactionTemp = Join-Path ([System.IO.Path]::GetTempPath()) ('oneaction-input-t
 $oneactionCases = @(
     @{ Name = 'Multiple types with fixed launch-template type'; Values = @{ node_instance_types = @('t3.medium', 't3a.medium') }; Expected = 'Supply exactly one instance type' },
     @{ Name = 'World-open API'; Values = @{ public_access_cidrs = @('0.0.0.0/0') }; Expected = 'Supply at least one explicit IPv4 CIDR' },
-    @{ Name = 'STS administrator'; Values = @{ admin_principal_arns = @('arn:aws:sts::123456789012:assumed-role/example/session') }; Expected = 'Supply existing IAM role ARNs' },
+    @{ Name = 'STS administrator'; Values = @{ admin_principal_arns = @('arn:aws:sts::974402993422:assumed-role/example/session') }; Expected = 'Supply existing IAM role ARNs' },
     @{ Name = 'Zero desired nodes'; Values = @{ node_scaling = @{ min = 2; desired = 0; max = 2 } }; Expected = 'Node counts must be integers' },
     @{ Name = 'ARM node with x86 AMI'; Values = @{ node_instance_types = @('t4g.medium') }; Expected = 'Use T3 or T3a x86_64' },
     @{ Name = 'Wrong workload region'; Values = @{ aws_region = 'us-east-1' }; Expected = 'The oneaction handoff requires the Seoul Region' },

@@ -40,7 +40,7 @@ $oneactionAllowedAddresses = @(
 )
 
 Assert-PlanCondition ($oneactionPlan.terraform_version -eq '1.5.7') 'Validate the team-pinned Terraform 1.5.7 plan.'
-Assert-PlanCondition ((@($oneactionPlan.configuration.provider_config.aws.expressions.allowed_account_ids.constant_value) -join ',') -eq '123456789012') 'Provider writes must be restricted to the team account.'
+Assert-PlanCondition ((@($oneactionPlan.configuration.provider_config.aws.expressions.allowed_account_ids.constant_value) -join ',') -eq '974402993422') 'Provider writes must be restricted to the team account.'
 Assert-PlanCondition ($oneactionPlan.variables.aws_region.value -eq 'ap-northeast-2') 'Use the Seoul workload Region.'
 Assert-PlanCondition ($null -eq $oneactionPlan.configuration.root_module.module_calls) 'Unexpected child module must be reviewed.'
 foreach ($resource in $oneactionPlan.resource_changes) {
@@ -57,7 +57,7 @@ foreach ($resource in $oneactionPlan.resource_changes) {
 foreach ($stackName in @('network', 'observability')) {
     $state = @($oneactionPlan.prior_state.values.root_module.resources | Where-Object address -EQ "data.terraform_remote_state.$stackName")
     Assert-PlanCondition ($state.Count -eq 1) "Missing refreshed $stackName state."
-    Assert-PlanCondition ($state[0].values.config.key -eq "dev/$stackName/terraform.tfstate" -and $state[0].values.config.bucket -eq 'oneaction-tfstate-123456789012' -and $state[0].values.config.region -eq 'ap-northeast-2') "Wrong remote state configuration for $stackName."
+    Assert-PlanCondition ($state[0].values.config.key -eq "dev/$stackName/terraform.tfstate" -and $state[0].values.config.bucket -eq 'oneaction-tfstate-974402993422' -and $state[0].values.config.region -eq 'ap-northeast-2') "Wrong remote state configuration for $stackName."
 }
 
 $cluster = Get-PlannedResource 'aws_eks_cluster.this'
@@ -111,7 +111,7 @@ Assert-PlanCondition (@(Compare-Object @($nodePolicies.change.after.policy_arn) 
 $admins = @($oneactionPlan.resource_changes | Where-Object { $_.type -eq 'aws_eks_access_entry' -and $_.mode -eq 'managed' })
 Assert-PlanCondition ($admins.Count -gt 0) 'At least one explicit administrator entry is required.'
 foreach ($admin in $admins) {
-    Assert-PlanCondition ($admin.change.after.principal_arn -match '^arn:aws:iam::123456789012:role/') 'Use stable team IAM role ARNs, not STS sessions.'
+    Assert-PlanCondition ($admin.change.after.principal_arn -match '^arn:aws:iam::974402993422:role/') 'Use stable team IAM role ARNs, not STS sessions.'
 }
 Assert-PlanCondition ($oneactionPlan.planned_values.outputs.eks_log_group_name.value -eq '/aws/eks/oneaction/cluster') 'Reuse the observability-owned log group.'
 

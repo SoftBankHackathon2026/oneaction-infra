@@ -8,7 +8,7 @@
 
 | 항목 | 값 |
 | --- | --- |
-| 계정 / 리전 | `123456789012` / `ap-northeast-2` |
+| 계정 / 리전 | `974402993422` / `ap-northeast-2` |
 | 클러스터 / VPC | EKS·network 원격 상태에서 조회 |
 | IAM 상태 키 | `dev/eks-lbc/terraform.tfstate` |
 | Controller / Helm chart | `v3.6.0` / `3.6.0` |

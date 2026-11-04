@@ -8,7 +8,7 @@
 
 | 항목 | 구성 |
 | --- | --- |
-| 계정·리전 | 123456789012 · ap-northeast-2 |
+| 계정·리전 | 974402993422 · ap-northeast-2 |
 | 클러스터 | oneaction · Kubernetes 1.36 · 표준 지원 정책 |
 | 네트워크 | network 상태의 Private EKS 서브넷 2개 |
 | API | VPC 내부 private endpoint + 지정된 IPv4 CIDR만 public endpoint 접근 |
@@ -61,7 +61,7 @@ AWS CLI v2와 Terraform 1.5.7을 PATH에 준비합니다. 현재 팀 계정은 I
 ```powershell
 aws sso login --profile sbhackathon2026-team --use-device-code
 $identity = aws sts get-caller-identity --profile sbhackathon2026-team --output json | ConvertFrom-Json
-if ($LASTEXITCODE -ne 0 -or $identity.Account -ne '123456789012') { throw '팀 계정 인증을 확인하세요.' }
+if ($LASTEXITCODE -ne 0 -or $identity.Account -ne '974402993422') { throw '팀 계정 인증을 확인하세요.' }
 
 # Terraform 1.5.7의 S3 backend에도 CLI의 임시 자격증명을 제공한다.
 # 자격증명 값을 출력하거나 파일에 저장하지 않는다.

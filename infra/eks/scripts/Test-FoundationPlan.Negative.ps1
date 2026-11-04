@@ -35,7 +35,7 @@ $oneactionTests = [ordered]@{
     }
     'Use an STS session as the administrator' = {
         param($plan)
-        ($plan.resource_changes | Where-Object type -EQ 'aws_eks_access_entry').change.after.principal_arn = 'arn:aws:sts::123456789012:assumed-role/example/session'
+        ($plan.resource_changes | Where-Object type -EQ 'aws_eks_access_entry').change.after.principal_arn = 'arn:aws:sts::974402993422:assumed-role/example/session'
     }
     'Wait for CoreDNS before creating nodes' = {
         param($plan)

@@ -2,12 +2,12 @@
 
 function Get-NotificationsOutputs {
     $values = Get-EsoOutputs
-    if ($values.notifications_role_arn -ne 'arn:aws:iam::123456789012:role/oneaction-external-secrets-argocd' -or
+    if ($values.notifications_role_arn -ne 'arn:aws:iam::974402993422:role/oneaction-external-secrets-argocd' -or
         -not $values.notifications_association_id -or
         $values.notifications_operator_namespace -ne 'external-secrets' -or
         $values.notifications_service_account -ne 'external-secrets-argocd' -or
         $values.notifications_target_namespace -ne 'argocd' -or
-        $values.review_service_secret_arn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-[A-Za-z0-9]{6}$') {
+        $values.review_service_secret_arn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-[A-Za-z0-9]{6}$') {
         throw 'Apply and verify the reviewed Notifications IAM/Pod Identity resources first.'
     }
     return $values
