@@ -65,6 +65,7 @@ run "least_privilege_secrets" {
     region        = "asia-northeast3"
     name          = "oneaction-dev"
     labels        = { project = "oneaction" }
+    workload_pool = "oneaction-test-123.svc.id.goog"
     review_bucket = "oneaction-test-review"
     enable_kafka  = false
   }

@@ -116,6 +116,7 @@ module "secrets" {
   labels        = local.labels
   review_bucket = module.storage.review_bucket_name
   enable_kafka  = var.enable_kafka
+  workload_pool = module.gke.contract.workload_pool
   depends_on    = [google_project_service.required]
 }
 

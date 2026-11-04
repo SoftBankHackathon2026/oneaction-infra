@@ -121,22 +121,22 @@ run "reject_kafka_memory_ratio" {
 run "identity_binding_depends_on_created_cluster_pool" {
   command = plan
   variables {
-    project_id = "oneaction-test-123"
+    project_id          = "oneaction-test-123"
     public_access_cidrs = ["203.0.113.10/32"]
-    db_password = "unit-test-only-not-a-real-password"
+    db_password         = "unit-test-only-not-a-real-password"
   }
   override_module {
     target = module.gke
     outputs = {
       contract = {
-        name = "oneaction-dev"
-        location = "asia-northeast3"
+        name          = "oneaction-dev"
+        location      = "asia-northeast3"
         workload_pool = "created-cluster-pool.svc.id.goog"
       }
     }
   }
   assert {
-    condition = module.secrets.workload_pool == "created-cluster-pool.svc.id.goog"
+    condition     = module.secrets.workload_pool == "created-cluster-pool.svc.id.goog"
     error_message = "Workload IAM bindings must consume the created cluster's pool output, not race its creation."
   }
 }

@@ -18,7 +18,7 @@ resource "google_service_account_iam_member" "workload_identity" {
   for_each           = local.identities
   service_account_id = google_service_account.this[each.key].name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "serviceAccount:${var.project_id}.svc.id.goog[${each.key == "workload" ? "platform/review-service" : each.key == "notifications" ? "external-secrets/external-secrets-argocd" : "external-secrets/external-secrets"}]"
+  member             = "serviceAccount:${var.workload_pool}[${each.key == "workload" ? "platform/review-service" : each.key == "notifications" ? "external-secrets/external-secrets-argocd" : "external-secrets/external-secrets"}]"
 }
 resource "google_secret_manager_secret_iam_member" "platform" {
   for_each  = local.secrets
@@ -49,3 +49,5 @@ resource "google_storage_bucket_iam_member" "documents" {
 }
 output "secret_ids" { value = { for key, secret in google_secret_manager_secret.this : key => secret.secret_id } }
 output "identities" { value = { for key, identity in google_service_account.this : key => identity.email } }
+
+output "workload_pool" { value = var.workload_pool }

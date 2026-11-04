@@ -22,3 +22,8 @@ variable "enable_kafka" {
   type = bool
 
 }
+
+variable "workload_pool" {
+  type        = string
+  description = "Created GKE workload identity pool; establishes cluster-before-IAM ordering."
+}
