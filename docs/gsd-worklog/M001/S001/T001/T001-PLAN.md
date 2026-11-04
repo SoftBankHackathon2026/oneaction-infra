@@ -3,7 +3,7 @@ unit: "T001"
 type: PLAN
 parent: "[[docs/gsd-worklog/M001/S001/S001-PLAN|S001-PLAN]]"
 created: "2026-11-04"
-status: in-progress
+status: complete
 ---
 
 # T001 PLAN
@@ -20,6 +20,7 @@ status: in-progress
 - 현재 Aolda 저장소의 WORKFLOW 단계 2는 다른 프로젝트이므로 변경하지 않습니다. 이 저장소 구현은 사용자의 직접 지시에 근거합니다.
 
 ## 3. 구현 목표
+- 산출물: [[infra/gcp/README|GCP 구성·적용 절차]]
 - AWS 대응 network/storage/dns/database/gke/load-balancer/observability/kafka/secrets 구성.
 - GCP 전용 상태, 프로젝트/환경 변수, 최소 권한 Workload Identity, 사설 데이터 계층.
 - 클라우드 실제 생성은 하지 않으며 정적 검증·모의 공급자 계획 검사와 독립 검증 증거를 남깁니다.
