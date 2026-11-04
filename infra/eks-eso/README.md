@@ -11,7 +11,7 @@
 | 계정 / 작업 리전 / 클러스터 | `974402993422` / `ap-northeast-2` / `oneaction` |
 | Terraform 상태 | `dev/eks-eso/terraform.tfstate` |
 | 참조 상태 | `dev/eks/terraform.tfstate`, `dev/database/terraform.tfstate` |
-| IAM 역할 / 인라인 정책 | `oneaction-external-secrets` / `read-review-db-secret`, `read-gitops-token-secret`, `read-review-service-secret` |
+| IAM 역할 / 인라인 정책 | `ghost-oneaction-external-secrets` / `read-review-db-secret`, `read-gitops-token-secret`, `read-review-service-secret` |
 | Pod Identity ServiceAccount | `external-secrets/external-secrets` |
 | ESO Helm release | `external-secrets/external-secrets` |
 | Chart / image | `2.12.0` / `ghcr.io/external-secrets/external-secrets:v2.12.0` |
@@ -135,7 +135,7 @@ ESO release와 동기화 manifest는 현재 인프라 작업에서 관리합니�
 | 항목 | 값 |
 | --- | --- |
 | 새 release / ServiceAccount | `external-secrets/external-secrets-argocd` |
-| IAM 역할 | `oneaction-external-secrets-argocd` |
+| IAM 역할 | `ghost-oneaction-external-secrets-argocd` |
 | AWS 읽기 범위 | 지정 `oneaction/review-service` Secret ARN 하나, `GetSecretValue`·`DescribeSecret`, 서울 리전 |
 | Kubernetes 읽기·쓰기 범위 | `argocd`의 ESO 리소스·Secret, 다른 namespace의 Secret 권한 없음 |
 | SecretStore / ExternalSecret | `argocd/review-service` / `argocd/argocd-notifications` |

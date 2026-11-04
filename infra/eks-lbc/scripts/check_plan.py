@@ -38,18 +38,20 @@ def check(plan):
         require(config['key'] == f'dev/{name}/terraform.tfstate', 'remote-state key')
         require(config['bucket'] == 'oneaction-tfstate-974402993422' and config['region'] == 'ap-northeast-2', 'remote-state location')
     role = resources['aws_iam_role.controller']['change']['after']
-    require(role['name'] == 'oneaction-aws-load-balancer-controller', 'role name')
+    require(role['name'] == 'ghost-oneaction-aws-load-balancer-controller', 'role name')
     trust = json.loads(role['assume_role_policy'])['Statement']
     require(len(trust) == 1, 'extra trust statements')
-    require(trust[0]['Action'] == 'sts:AssumeRoleWithWebIdentity', 'trust action')
-    oidc = states['data.terraform_remote_state.eks']['outputs']['oidc_provider_arn']
-    require(trust[0]['Principal'] == {'Federated': oidc}, 'trust principal')
+    # Pod Identity 신뢰 (계정 정책상 OIDC 공급자를 만들 수 없어 IRSA 를 쓰지 않는다)
+    require(sorted(trust[0]['Action']) == ['sts:AssumeRole', 'sts:TagSession'], 'trust action')
+    require(trust[0]['Principal'] == {'Service': 'pods.eks.amazonaws.com'}, 'trust principal')
     condition = trust[0]['Condition']
     require(set(condition) == {'StringEquals'}, 'trust operator')
     claims = condition['StringEquals']
-    require(len(claims) == 2, 'trust claims')
-    require(next(v for k, v in claims.items() if k.endswith(':sub')) == 'system:serviceaccount:kube-system:aws-load-balancer-controller', 'service account trust')
-    require(next(v for k, v in claims.items() if k.endswith(':aud')) == 'sts.amazonaws.com', 'OIDC audience')
+    require(claims == {'aws:RequestTag/kubernetes-namespace': 'kube-system',
+                       'aws:RequestTag/kubernetes-service-account': 'aws-load-balancer-controller'}, 'service account trust')
+    require(role['permissions_boundary'] == 'arn:aws:iam::974402993422:policy/GhostWorkloadBoundary', 'permissions boundary')
+    association = resources['aws_eks_pod_identity_association.controller']['change']['after']
+    require(association['namespace'] == 'kube-system' and association['service_account'] == 'aws-load-balancer-controller', 'pod identity association')
     inline = resources['aws_iam_role_policy.controller']['change']['after']
     require(inline['role'] == role['name'], 'inline policy role')
     configuration = plan['configuration']['root_module']['resources']

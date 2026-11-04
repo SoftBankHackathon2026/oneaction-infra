@@ -2,7 +2,7 @@
 
 function Get-NotificationsOutputs {
     $values = Get-EsoOutputs
-    if ($values.notifications_role_arn -ne 'arn:aws:iam::974402993422:role/oneaction-external-secrets-argocd' -or
+    if ($values.notifications_role_arn -ne 'arn:aws:iam::974402993422:role/ghost-oneaction-external-secrets-argocd' -or
         -not $values.notifications_association_id -or
         $values.notifications_operator_namespace -ne 'external-secrets' -or
         $values.notifications_service_account -ne 'external-secrets-argocd' -or

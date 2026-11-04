@@ -29,7 +29,7 @@ AWS provider 5.100에서 Standard 크레딧 설정이 전달되도록 인스턴�
 
 배포한 애드온 버전은 `addon_versions`의 기본값에 고정합니다: VPC CNI `v1.22.4-eksbuild.3`, kube-proxy `v1.36.0-eksbuild.25`, CoreDNS `v1.14.6-eksbuild.4`, Pod Identity Agent `v1.3.10-eksbuild.3`. AWS 기본 버전이 바뀌어도 다음 plan에 자동 업그레이드가 섞이지 않도록 기본 버전 조회를 제거했습니다. 클러스터 버전 변경 시 네 애드온의 호환성을 함께 검토하고, 버전 override는 네 항목 모두 명시합니다. 빈 map이나 일부 버전만 넣는 입력은 거부합니다.
 
-VPC CNI는 `kube-system/aws-node`만 사용할 수 있는 별도 IRSA 역할에 `AmazonEKS_CNI_Policy`를 연결합니다. 초기 네트워킹을 Pod Identity Agent의 실행과 분리하고, 일반 노드 역할에 CNI 권한을 주지 않습니다. 노드 역할에는 `AmazonEKSWorkerNodePolicy`, `AmazonEC2ContainerRegistryPullOnly`만 연결합니다. 후속 ESO는 Pod Identity를 우선 사용하며 이 단계에서 Secrets Manager 읽기 권한을 부여하지 않습니다.
+VPC CNI는 노드 역할의 `AmazonEKS_CNI_Policy`로 동작합니다. 팀 계정(974402993422)의 SSO 역할은 OIDC 공급자를 만들 수 없어 IRSA를 쓸 수 없고, Pod Identity Agent는 노드가 Ready 된 뒤에 뜨므로 CNI 부팅에 쓸 수 없습니다. 노드 역할에는 `AmazonEKSWorkerNodePolicy`, `AmazonEC2ContainerRegistryPullOnly`, `AmazonEKS_CNI_Policy`를 연결합니다. 이 계정의 IAM 역할은 이름이 `ghost-`로 시작하고 권한 경계 `GhostWorkloadBoundary`가 붙어야 생성됩니다. 후속 ESO는 Pod Identity를 우선 사용하며 이 단계에서 Secrets Manager 읽기 권한을 부여하지 않습니다.
 
 네트워킹 애드온 → Managed Node Group → CoreDNS/Pod Identity Agent 순서로 생성합니다. CoreDNS를 노드보다 먼저 완료시키려는 의존 관계를 만들지 않습니다. 기본 unmanaged 애드온의 자동 설치를 끄고 managed 애드온 생성 시 충돌을 덮어쓰지 않습니다.
 
@@ -167,7 +167,7 @@ terraform apply foundation.tfplan
 
 ## 후속 인계
 
-`cluster_name`, `cluster_arn`, `cluster_endpoint`, `cluster_certificate_authority_data`, `cluster_security_group_id`, `node_group_name`, `node_role_arn`, `oidc_provider_arn`, `eks_log_group_name`, `addon_versions`를 제공합니다. 사람의 CLI 접속은 실제 EKS endpoint를 사용합니다. 현재 Argo CD는 같은 EKS 내부에 설치하며 Application의 `destination.server`는 `https://kubernetes.default.svc`입니다. 설치 manifest의 ServiceAccount·Kubernetes RBAC를 사용하고, UI는 `kubectl port-forward`로 접속합니다.
+`cluster_name`, `cluster_arn`, `cluster_endpoint`, `cluster_certificate_authority_data`, `cluster_security_group_id`, `node_group_name`, `node_role_arn`, `eks_log_group_name`, `addon_versions`를 제공합니다. 사람의 CLI 접속은 실제 EKS endpoint를 사용합니다. 현재 Argo CD는 같은 EKS 내부에 설치하며 Application의 `destination.server`는 `https://kubernetes.default.svc`입니다. 설치 manifest의 ServiceAccount·Kubernetes RBAC를 사용하고, UI는 `kubectl port-forward`로 접속합니다.
 
 후속 구현 순서: AWS Load Balancer Controller → External Secrets Operator/Pod Identity → 기존 platform-tg의 TargetGroupBinding → Argo CD 연결과 GitOps 배포 검증.
 
@@ -175,6 +175,6 @@ terraform apply foundation.tfplan
 
 - [EKS 지원 버전](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html)
 - [사용자 Launch Template과 보안그룹](https://docs.aws.amazon.com/eks/latest/userguide/launch-templates.html)
-- [VPC CNI 전용 IRSA 역할](https://docs.aws.amazon.com/eks/latest/userguide/cni-iam-role.html)
+- [VPC CNI IAM 권한](https://docs.aws.amazon.com/eks/latest/userguide/cni-iam-role.html)
 - [EKS 가격](https://aws.amazon.com/eks/pricing/)
 - [AWS Price List API](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html)

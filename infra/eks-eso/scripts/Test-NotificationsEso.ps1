@@ -30,7 +30,7 @@ try {
     Invoke-EsoNative 'kubectl' ($base + @('-n','external-secrets','wait','--for=condition=Ready',"pod/$identityName",'--timeout=180s')) | Out-Host
     $exec = $base + @('-n','external-secrets','exec',$identityName,'--')
     $identity = (Invoke-EsoNative 'kubectl' ($exec + @('aws','sts','get-caller-identity','--region','ap-northeast-2','--output','json'))) -join "`n" | ConvertFrom-Json
-    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/oneaction-external-secrets-argocd/*') { throw 'Test Pod did not use the dedicated Notifications role.' }
+    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/ghost-oneaction-external-secrets-argocd/*') { throw 'Test Pod did not use the dedicated Notifications role.' }
     $version = (Invoke-EsoNative 'kubectl' ($exec + @('aws','secretsmanager','get-secret-value','--secret-id',$outputs.review_service_secret_arn,'--region','ap-northeast-2','--query','{ARN:ARN,VersionId:VersionId}','--output','json'))) -join "`n" | ConvertFrom-Json
     if ($version.ARN -ne $outputs.review_service_secret_arn -or -not $version.VersionId) { throw 'Notifications source read failed.' }
     foreach ($deniedArn in @($outputs.secret_arn,$outputs.gitops_token_secret_arn)) {

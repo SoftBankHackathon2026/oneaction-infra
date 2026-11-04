@@ -55,9 +55,16 @@ data "aws_iam_policy_document" "flow_logs_assume_role" {
   }
 }
 
+# 팀 계정(974402993422)의 SSO 역할은 이름이 ghost- 로 시작하고 권한 경계 GhostWorkloadBoundary 가 붙은
+# IAM 역할만 만들 수 있다. 경계는 IAM 을 뺀 AWS 작업을 허용한다.
+locals {
+  iam_permissions_boundary = "arn:aws:iam::974402993422:policy/GhostWorkloadBoundary"
+}
+
 resource "aws_iam_role" "flow_logs" {
-  name               = "oneaction-vpc-flow-logs"
-  assume_role_policy = data.aws_iam_policy_document.flow_logs_assume_role.json
+  name                 = "ghost-oneaction-vpc-flow-logs"
+  permissions_boundary = local.iam_permissions_boundary
+  assume_role_policy   = data.aws_iam_policy_document.flow_logs_assume_role.json
 }
 
 data "aws_iam_policy_document" "flow_logs" {

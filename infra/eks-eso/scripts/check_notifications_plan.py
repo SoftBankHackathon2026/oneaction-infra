@@ -16,7 +16,7 @@ from check_plan import check as check_existing_eso
 REVIEW_SECRET = "arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-GhIjKl"
 GITOPS_SECRET = "arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/gitops-token-AbCdEf"
 CLUSTER_ARN = "arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction"
-ROLE_NAME = "oneaction-external-secrets-argocd"
+ROLE_NAME = "ghost-oneaction-external-secrets-argocd"
 ROLE_ARN = f"arn:aws:iam::974402993422:role/{ROLE_NAME}"
 OPERATOR_NAMESPACE = "external-secrets"
 SERVICE_ACCOUNT = "external-secrets-argocd"
@@ -168,7 +168,7 @@ def check_negative_cases(plan, review_service_secret_arn, gitops_token_secret_ar
         "Secret write": lambda p: mutate_policy(p, "Action", ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:PutSecretValue"]),
         "multiple Secrets": lambda p: mutate_policy(p, "Resource", [review_service_secret_arn, gitops_token_secret_arn]),
         "missing region boundary": lambda p: mutate_policy(p, "Condition", {}),
-        "wrong policy role": lambda p: resource(p, POLICY)["change"]["after"].update(role="oneaction-external-secrets"),
+        "wrong policy role": lambda p: resource(p, POLICY)["change"]["after"].update(role="ghost-oneaction-external-secrets"),
         "wildcard ServiceAccount trust": lambda p: mutate_trust(p, "aws:RequestTag/kubernetes-service-account", "*"),
         "wrong namespace trust": lambda p: mutate_trust(p, "aws:RequestTag/kubernetes-namespace", "argocd"),
         "wrong cluster trust": lambda p: mutate_trust(p, "aws:RequestTag/eks-cluster-arn", "*"),

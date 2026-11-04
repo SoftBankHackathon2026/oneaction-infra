@@ -41,7 +41,7 @@ try {
     Invoke-EsoNative 'kubectl' ($operator + @('wait','--for=condition=Ready',"pod/$identityName",'--timeout=180s'))
     $exec = $operator + @('exec',$identityName,'--','aws')
     $identity = (Invoke-EsoNative 'kubectl' ($exec + @('sts','get-caller-identity','--region','ap-northeast-2','--output','json'))) -join "`n" | ConvertFrom-Json
-    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/oneaction-external-secrets/*') { throw 'Pod did not use the dedicated ESO role.' }
+    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/ghost-oneaction-external-secrets/*') { throw 'Pod did not use the dedicated ESO role.' }
     Invoke-EsoNative 'kubectl' ($exec + @('secretsmanager','describe-secret','--secret-id',$outputs.secret_arn,'--region','ap-northeast-2','--query','OwningService','--output','text')) | Out-Null
     if ($outputs.gitops_token_secret_arn) {
         if ($outputs.gitops_token_secret_arn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:[A-Za-z0-9/_+=.@-]+-[A-Za-z0-9]{6}$' -or $outputs.gitops_token_secret_arn -eq $outputs.secret_arn) { throw 'Unexpected GitOps token Secret ARN.' }

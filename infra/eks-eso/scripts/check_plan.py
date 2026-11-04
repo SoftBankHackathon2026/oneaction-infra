@@ -56,7 +56,7 @@ def check(plan, gitops_secret_arn=None, review_service_secret_arn=None):
     require(prior['data.aws_secretsmanager_secret.rds']['arn'] == secret_arn, 'Secret metadata matches database state')
     require(not prior['data.aws_secretsmanager_secret.rds'].get('kms_key_id'), 'unexpected customer-managed KMS key')
     role = resources['aws_iam_role.eso']['change']['after']
-    require(role['name'] == 'oneaction-external-secrets', 'role name')
+    require(role['name'] == 'ghost-oneaction-external-secrets', 'role name')
     trust = json.loads(role['assume_role_policy'])['Statement']
     require(len(trust) == 1 and trust[0]['Effect'] == 'Allow', 'trust statements')
     require(trust[0]['Principal'] == {'Service': 'pods.eks.amazonaws.com'}, 'Pod Identity principal')

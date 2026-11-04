@@ -36,7 +36,8 @@ else:
     assert container['resources']['requests'] == {'cpu': '50m', 'memory': '128Mi'}
     assert container['resources']['limits'] == {'cpu': '250m', 'memory': '256Mi'}
     sa = next(d for d in docs if d['kind'] == 'ServiceAccount')
-    assert sa['metadata']['annotations']['eks.amazonaws.com/role-arn'] == 'arn:aws:iam::974402993422:role/oneaction-aws-load-balancer-controller'
+    # Pod Identity: IRSA 어노테이션이 있으면 SDK 가 웹 아이덴티티 경로를 먼저 시도해 실패한다.
+    assert 'eks.amazonaws.com/role-arn' not in (sa['metadata'].get('annotations') or {})
     crds = [d for d in docs if d['kind'] == 'CustomResourceDefinition']
     assert any(d['metadata']['name'] == 'targetgroupbindings.elbv2.k8s.aws' for d in crds)
     assert any(d['kind'] == 'ValidatingWebhookConfiguration' for d in docs)

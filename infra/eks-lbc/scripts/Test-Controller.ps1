@@ -34,7 +34,7 @@ try {
     Invoke-LbcNative 'kubectl' ($ns + @('wait', '--for=condition=Ready', "pod/$podName", '--timeout=180s'))
     $exec = $ns + @('exec', $podName, '--', 'aws')
     $identity = (Invoke-LbcNative 'kubectl' ($exec + @('sts', 'get-caller-identity', '--region', 'ap-northeast-2', '--output', 'json'))) -join "`n" | ConvertFrom-Json
-    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/oneaction-aws-load-balancer-controller/*') { throw 'The Pod did not assume the dedicated controller role.' }
+    if ($identity.Account -ne '974402993422' -or $identity.Arn -notlike 'arn:aws:sts::974402993422:assumed-role/ghost-oneaction-aws-load-balancer-controller/*') { throw 'The Pod did not assume the dedicated controller role.' }
     $podTg = (Invoke-LbcNative 'kubectl' ($exec + @('elbv2', 'describe-target-groups', '--target-group-arns', $arn, '--region', 'ap-northeast-2', '--output', 'json'))) -join "`n" | ConvertFrom-Json
     if ($podTg.TargetGroups[0].VpcId -ne $outputs.vpc_id) { throw 'Pod target-group read failed.' }
     Invoke-LbcNative 'kubectl' ($exec + @('elbv2', 'describe-target-health', '--target-group-arn', $arn, '--region', 'ap-northeast-2', '--query', 'length(TargetHealthDescriptions)', '--output', 'text'))

@@ -11,7 +11,7 @@ function Get-EsoOutputs {
     $raw = (Invoke-EsoNative 'terraform' @("-chdir=$EsoStack", 'output', '-json')) -join "`n" | ConvertFrom-Json
     $values = @{}
     foreach ($property in $raw.PSObject.Properties) { $values[$property.Name] = $property.Value.value }
-    if ($values.cluster_name -ne 'oneaction' -or $values.aws_region -ne 'ap-northeast-2' -or $values.role_arn -ne 'arn:aws:iam::974402993422:role/oneaction-external-secrets' -or $values.secret_arn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:rds!db-' -or $values.target_namespace -ne 'platform' -or $values.operator_namespace -ne 'external-secrets') {
+    if ($values.cluster_name -ne 'oneaction' -or $values.aws_region -ne 'ap-northeast-2' -or $values.role_arn -ne 'arn:aws:iam::974402993422:role/ghost-oneaction-external-secrets' -or $values.secret_arn -notmatch '^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:rds!db-' -or $values.target_namespace -ne 'platform' -or $values.operator_namespace -ne 'external-secrets') {
         throw 'The IAM outputs do not match the reviewed oneaction ESO deployment.'
     }
     return $values

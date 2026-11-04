@@ -29,7 +29,7 @@ def main(path):
     enabled['resource_changes'].append({
         'address': address, 'mode': 'managed', 'type': 'aws_iam_role_policy',
         'change': {'actions': ['create'], 'before': None, 'after': {
-            'role': 'oneaction-external-secrets', 'name': 'read-gitops-token-secret',
+            'role': 'ghost-oneaction-external-secrets', 'name': 'read-gitops-token-secret',
             'policy': json.dumps(policy),
         }},
     })

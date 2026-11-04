@@ -40,25 +40,24 @@ data "terraform_remote_state" "network" {
   backend = "s3"
   config  = merge(local.state_config, { key = "dev/network/terraform.tfstate" })
 }
-data "aws_iam_openid_connect_provider" "eks" {
-  arn = data.terraform_remote_state.eks.outputs.oidc_provider_arn
-}
+# 팀 계정은 OIDC 공급자를 만들 수 없어 IRSA 대신 EKS Pod Identity 를 쓴다 (eks-pod-identity-agent 애드온).
+# 역할 이름은 ghost- 로 시작하고 권한 경계 GhostWorkloadBoundary 가 붙어야 한다.
 data "aws_iam_policy_document" "trust" {
   statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
+    actions = ["sts:AssumeRole", "sts:TagSession"]
     principals {
-      type        = "Federated"
-      identifiers = [data.aws_iam_openid_connect_provider.eks.arn]
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
     }
     condition {
       test     = "StringEquals"
-      variable = "${trimprefix(data.aws_iam_openid_connect_provider.eks.url, "https://")}:aud"
-      values   = ["sts.amazonaws.com"]
+      variable = "aws:RequestTag/kubernetes-namespace"
+      values   = ["kube-system"]
     }
     condition {
       test     = "StringEquals"
-      variable = "${trimprefix(data.aws_iam_openid_connect_provider.eks.url, "https://")}:sub"
-      values   = ["system:serviceaccount:kube-system:aws-load-balancer-controller"]
+      variable = "aws:RequestTag/kubernetes-service-account"
+      values   = ["aws-load-balancer-controller"]
     }
   }
 }
@@ -87,8 +86,9 @@ locals {
   })]
 }
 resource "aws_iam_role" "controller" {
-  name               = "${local.cluster_name}-aws-load-balancer-controller"
-  assume_role_policy = data.aws_iam_policy_document.trust.json
+  name                 = "ghost-${local.cluster_name}-aws-load-balancer-controller"
+  permissions_boundary = "arn:aws:iam::974402993422:policy/GhostWorkloadBoundary"
+  assume_role_policy   = data.aws_iam_policy_document.trust.json
   lifecycle {
     precondition {
       condition     = local.cluster_name == "oneaction"
@@ -107,6 +107,13 @@ resource "aws_iam_role_policy" "controller" {
       Condition = { for operator, conditions in statement.Condition : operator => conditions if length(conditions) > 0 }
     } : {}
   )] })
+}
+resource "aws_eks_pod_identity_association" "controller" {
+  cluster_name    = local.cluster_name
+  namespace       = "kube-system"
+  service_account = "aws-load-balancer-controller"
+  role_arn        = aws_iam_role.controller.arn
+  depends_on      = [aws_iam_role_policy.controller]
 }
 output "cluster_name" { value = local.cluster_name }
 output "aws_region" { value = var.aws_region }

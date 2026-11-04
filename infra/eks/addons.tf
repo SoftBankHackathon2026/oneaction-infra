@@ -4,11 +4,10 @@ resource "aws_eks_addon" "networking" {
   cluster_name                = aws_eks_cluster.this.name
   addon_name                  = each.value
   addon_version               = var.addon_versions[each.value]
-  service_account_role_arn    = each.value == "vpc-cni" ? aws_iam_role.cni.arn : null
   resolve_conflicts_on_create = "NONE"
   resolve_conflicts_on_update = "PRESERVE"
 
-  depends_on = [aws_iam_role_policy_attachment.cni]
+  depends_on = [aws_iam_role_policy_attachment.node]
 }
 
 resource "aws_eks_addon" "runtime" {
