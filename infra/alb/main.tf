@@ -13,7 +13,7 @@ provider "aws" {
 
 locals {
   state_config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
     encrypt        = true

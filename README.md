@@ -2,7 +2,7 @@
 
 oneaction 서비스의 AWS 인프라를 정의한 Terraform 코드입니다. 네트워크부터 EKS, 데이터 계층, 시크릿 동기화까지 스택 단위로 나눠 관리하며, 애플리케이션 배포는 별도 GitOps 저장소의 Argo CD가 담당합니다.
 
-> 공개용 저장소입니다. AWS 계정 ID·Secret ARN·리소스 주소는 예시값(`123456789012` 등)으로 바꿨고, 운영 기록 문서는 제외했습니다.
+> 공개 저장소입니다. AWS 계정 ID는 실제 팀 계정 `974402993422`(t3underline)로 맞췄습니다. Secret ARN 처럼 리소스를 만든 뒤에 정해지는 값은 아직 예시값이고, 운영 기록 문서는 제외했습니다.
 
 ## 아키텍처
 
@@ -43,6 +43,7 @@ flowchart LR
 | 8 | [`eks-lbc`](infra/eks-lbc) | AWS Load Balancer Controller용 IRSA 역할·정책, Helm values |
 | 9 | [`eks-eso`](infra/eks-eso) | External Secrets Operator용 Pod Identity, Secret별 최소 읽기 정책 |
 | 10 | [`msk`](infra/msk) | MSK Kafka 클러스터(`kafka.t3.small` × 2), EKS 서브넷에서만 허용하는 보안그룹 |
+| 11 | [`tailscale`](infra/tailscale) | Tailscale 서브넷 라우터(`t4g.nano`, EKS private 서브넷). 온프렘 k3s 가 tailnet 으로 RDS·MSK 에 닿는 경로 |
 
 ## 설계 포인트
 
@@ -80,7 +81,12 @@ Terraform 1.5.7 · AWS provider 5.x · Amazon EKS · RDS for PostgreSQL · Amazo
 
 Notifications manifest의 source pin은 `SoftBankHackathon2026/gitops`의 확인한 커밋으로 갱신했고 파일 hash와 검증 코드도 맞췄다.
 
-이 저장소의 `123456789012`, 상태 버킷, 예시 Secret ARN은 공개용 예시값이다. 실제 AWS 계정·리소스가 조회되지 않은 상태에서 이름만 추측해 교체하지 않는다. 이번 확인에서 default 프로필은 자격증명이 없고 onetatchi 프로필은 SSO가 만료됐다. 실제 환경 준비에는 다음 입력이 필요하다.
+2026-11-04: 계정 ID와 상태 버킷은 실제 값(`974402993422`, `oneaction-tfstate-974402993422`)으로 맞췄다. 계정은 `hackerthon` SSO 프로필의 로그인 세션으로 확인했다. 아래 값은 리소스를 만든 뒤에야 정해지므로 아직 예시값이다.
+
+- `infra/eks/example.tfvars` 의 관리자 IAM 역할 ARN (SSO 역할 경로 포함)
+- `infra/eks-eso` 의 Secret ARN 기본값과 검증 스크립트 상수 (`...-AbCdEf`, `...-GhIjKl`)
+
+실제 환경 준비에는 다음 입력이 필요하다.
 
 1. 사용할 AWS 프로필과 STS 계정 확인.
 2. 이미 존재하거나 별도로 준비한 Terraform 상태 버킷·잠금 테이블 이름과 권한.

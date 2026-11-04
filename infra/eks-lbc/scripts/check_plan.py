@@ -19,7 +19,7 @@ def check(plan):
 
     require(plan['terraform_version'] == '1.5.7', 'Terraform version')
     provider = plan['configuration']['provider_config']['aws']['expressions']
-    require(provider['allowed_account_ids']['constant_value'] == ['123456789012'], 'account guard')
+    require(provider['allowed_account_ids']['constant_value'] == ['974402993422'], 'account guard')
     require(plan['variables']['aws_region']['value'] == 'ap-northeast-2', 'region')
     allowed = {'aws_iam_role.controller', 'aws_iam_role_policy.controller'}
     resources = {r['address']: r for r in plan['resource_changes'] if r['mode'] == 'managed'}
@@ -36,20 +36,22 @@ def check(plan):
     for name in ['eks', 'network']:
         config = states[f'data.terraform_remote_state.{name}']['config']
         require(config['key'] == f'dev/{name}/terraform.tfstate', 'remote-state key')
-        require(config['bucket'] == 'oneaction-tfstate-123456789012' and config['region'] == 'ap-northeast-2', 'remote-state location')
+        require(config['bucket'] == 'oneaction-tfstate-974402993422' and config['region'] == 'ap-northeast-2', 'remote-state location')
     role = resources['aws_iam_role.controller']['change']['after']
-    require(role['name'] == 'oneaction-aws-load-balancer-controller', 'role name')
+    require(role['name'] == 'ghost-oneaction-aws-load-balancer-controller', 'role name')
     trust = json.loads(role['assume_role_policy'])['Statement']
     require(len(trust) == 1, 'extra trust statements')
-    require(trust[0]['Action'] == 'sts:AssumeRoleWithWebIdentity', 'trust action')
-    oidc = states['data.terraform_remote_state.eks']['outputs']['oidc_provider_arn']
-    require(trust[0]['Principal'] == {'Federated': oidc}, 'trust principal')
+    # Pod Identity 신뢰 (계정 정책상 OIDC 공급자를 만들 수 없어 IRSA 를 쓰지 않는다)
+    require(sorted(trust[0]['Action']) == ['sts:AssumeRole', 'sts:TagSession'], 'trust action')
+    require(trust[0]['Principal'] == {'Service': 'pods.eks.amazonaws.com'}, 'trust principal')
     condition = trust[0]['Condition']
     require(set(condition) == {'StringEquals'}, 'trust operator')
     claims = condition['StringEquals']
-    require(len(claims) == 2, 'trust claims')
-    require(next(v for k, v in claims.items() if k.endswith(':sub')) == 'system:serviceaccount:kube-system:aws-load-balancer-controller', 'service account trust')
-    require(next(v for k, v in claims.items() if k.endswith(':aud')) == 'sts.amazonaws.com', 'OIDC audience')
+    require(claims == {'aws:RequestTag/kubernetes-namespace': 'kube-system',
+                       'aws:RequestTag/kubernetes-service-account': 'aws-load-balancer-controller'}, 'service account trust')
+    require(role['permissions_boundary'] == 'arn:aws:iam::974402993422:policy/GhostWorkloadBoundary', 'permissions boundary')
+    association = resources['aws_eks_pod_identity_association.controller']['change']['after']
+    require(association['namespace'] == 'kube-system' and association['service_account'] == 'aws-load-balancer-controller', 'pod identity association')
     inline = resources['aws_iam_role_policy.controller']['change']['after']
     require(inline['role'] == role['name'], 'inline policy role')
     configuration = plan['configuration']['root_module']['resources']
@@ -66,12 +68,12 @@ def check(plan):
     require(not any(a.startswith(('waf-regional:', 'wafv2:', 'shield:')) or a == 'elasticloadbalancing:SetWebAcl' for a in all_actions), 'disabled-feature permissions')
     require({'elasticloadbalancing:RegisterTargets', 'elasticloadbalancing:DeregisterTargets', 'elasticloadbalancing:DescribeTargetGroups', 'elasticloadbalancing:CreateLoadBalancer'} <= all_actions, 'required IAM calls')
     vpc = states['data.terraform_remote_state.network']['outputs']['vpc_id']
-    vpc_arn = f'arn:aws:ec2:ap-northeast-2:123456789012:vpc/{vpc}'
+    vpc_arn = f'arn:aws:ec2:ap-northeast-2:974402993422:vpc/{vpc}'
     creation = [s for s in policy['Statement'] if 'ec2:CreateSecurityGroup' in s['Action']]
     require(len(creation) == 1, 'one SG creation statement')
     require(creation[0] == {
         'Effect': 'Allow', 'Action': ['ec2:CreateSecurityGroup'],
-        'Resource': [vpc_arn, 'arn:aws:ec2:ap-northeast-2:123456789012:security-group/*'],
+        'Resource': [vpc_arn, 'arn:aws:ec2:ap-northeast-2:974402993422:security-group/*'],
         'Condition': {'StringEquals': {'aws:RequestedRegion': 'ap-northeast-2'}},
     }, 'SG creation resource and region boundary')
     change = resources['aws_iam_role_policy.controller']['change']
@@ -102,7 +104,7 @@ def check(plan):
             if key in ['aws:ResourceTag/elbv2.k8s.aws/cluster', 'aws:RequestTag/elbv2.k8s.aws/cluster'] and value == 'false':
                 require(c['StringEquals'][key] == 'oneaction', 'cluster tag boundary')
         for arn in statement['Resource']:
-            require(arn == '*' or ':ap-northeast-2:123456789012:' in arn, 'resource ARN boundary')
+            require(arn == '*' or ':ap-northeast-2:974402993422:' in arn, 'resource ARN boundary')
     require(plan['planned_values']['outputs']['cluster_name']['value'] == 'oneaction', 'cluster output')
     require('dev/eks-lbc/terraform.tfstate' in (STACK / 'versions.tf').read_text(), 'backend key')
     return count
@@ -142,7 +144,7 @@ if __name__ == '__main__':
             elif mode == 'vpc':
                 statement['Resource'][0] = statement['Resource'][0].replace('vpc/', 'vpc/other-')
             elif mode == 'account':
-                statement['Resource'][1] = statement['Resource'][1].replace('123456789012', '111122223333')
+                statement['Resource'][1] = statement['Resource'][1].replace('974402993422', '111122223333')
             elif mode == 'region':
                 statement['Resource'][1] = statement['Resource'][1].replace('ap-northeast-2', 'us-east-1')
             elif mode == 'condition':

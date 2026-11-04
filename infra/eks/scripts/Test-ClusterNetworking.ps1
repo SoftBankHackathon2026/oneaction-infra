@@ -16,7 +16,7 @@ function Invoke-CheckedNative {
 }
 
 $identity = (Invoke-CheckedNative 'aws' @('sts', 'get-caller-identity', '--profile', $Profile, '--region', $oneactionRegion, '--output', 'json', '--no-cli-pager')) -join "`n" | ConvertFrom-Json
-if ($identity.Account -ne '123456789012') { throw 'The AWS profile must use team account 123456789012.' }
+if ($identity.Account -ne '974402993422') { throw 'The AWS profile must use team account 974402993422.' }
 $nodeGroup = (Invoke-CheckedNative 'aws' @('eks', 'describe-nodegroup', '--cluster-name', 'oneaction', '--nodegroup-name', 'oneaction-general', '--profile', $Profile, '--region', $oneactionRegion, '--query', 'nodegroup', '--output', 'json', '--no-cli-pager')) -join "`n" | ConvertFrom-Json
 if ($nodeGroup.status -ne 'ACTIVE') { throw 'Run the Ready checks before the networking smoke test.' }
 

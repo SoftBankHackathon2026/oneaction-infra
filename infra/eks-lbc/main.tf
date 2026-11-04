@@ -17,14 +17,14 @@ variable "owner" {
 provider "aws" {
   profile             = var.aws_profile == "" ? null : var.aws_profile
   region              = var.aws_region
-  allowed_account_ids = ["123456789012"]
+  allowed_account_ids = ["974402993422"]
   default_tags {
     tags = { Project = "oneaction", Owner = var.owner, Env = "dev" }
   }
 }
 locals {
   state_config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
     encrypt        = true
@@ -40,25 +40,24 @@ data "terraform_remote_state" "network" {
   backend = "s3"
   config  = merge(local.state_config, { key = "dev/network/terraform.tfstate" })
 }
-data "aws_iam_openid_connect_provider" "eks" {
-  arn = data.terraform_remote_state.eks.outputs.oidc_provider_arn
-}
+# 팀 계정은 OIDC 공급자를 만들 수 없어 IRSA 대신 EKS Pod Identity 를 쓴다 (eks-pod-identity-agent 애드온).
+# 역할 이름은 ghost- 로 시작하고 권한 경계 GhostWorkloadBoundary 가 붙어야 한다.
 data "aws_iam_policy_document" "trust" {
   statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
+    actions = ["sts:AssumeRole", "sts:TagSession"]
     principals {
-      type        = "Federated"
-      identifiers = [data.aws_iam_openid_connect_provider.eks.arn]
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
     }
     condition {
       test     = "StringEquals"
-      variable = "${trimprefix(data.aws_iam_openid_connect_provider.eks.url, "https://")}:aud"
-      values   = ["sts.amazonaws.com"]
+      variable = "aws:RequestTag/kubernetes-namespace"
+      values   = ["kube-system"]
     }
     condition {
       test     = "StringEquals"
-      variable = "${trimprefix(data.aws_iam_openid_connect_provider.eks.url, "https://")}:sub"
-      values   = ["system:serviceaccount:kube-system:aws-load-balancer-controller"]
+      variable = "aws:RequestTag/kubernetes-service-account"
+      values   = ["aws-load-balancer-controller"]
     }
   }
 }
@@ -70,10 +69,10 @@ locals {
     # CreateSecurityGroup authorizes both the destination VPC and the new SG.
     # ec2:Vpc is not a supported condition key for this creation action.
     Resource = contains(statement.Action, "ec2:CreateSecurityGroup") ? [
-      "arn:aws:ec2:${var.aws_region}:123456789012:vpc/${local.vpc_id}",
-      "arn:aws:ec2:${var.aws_region}:123456789012:security-group/*"
+      "arn:aws:ec2:${var.aws_region}:974402993422:vpc/${local.vpc_id}",
+      "arn:aws:ec2:${var.aws_region}:974402993422:security-group/*"
       ] : [for resource in flatten([statement.Resource]) :
-      replace(replace(resource, "arn:aws:ec2:*:*:", "arn:aws:ec2:${var.aws_region}:123456789012:"), "arn:aws:elasticloadbalancing:*:*:", "arn:aws:elasticloadbalancing:${var.aws_region}:123456789012:")
+      replace(replace(resource, "arn:aws:ec2:*:*:", "arn:aws:ec2:${var.aws_region}:974402993422:"), "arn:aws:elasticloadbalancing:*:*:", "arn:aws:elasticloadbalancing:${var.aws_region}:974402993422:")
     ]
     Condition = merge(try(statement.Condition, {}), {
       StringEquals = merge(try(statement.Condition.StringEquals, {}),
@@ -82,13 +81,14 @@ locals {
         alltrue([for action in statement.Action : can(regex("^(ec2|elasticloadbalancing):", action))]) ? { "aws:RequestedRegion" = var.aws_region } : {}
       )
       }, length([for action in statement.Action : action if contains(["ec2:AuthorizeSecurityGroupIngress", "ec2:RevokeSecurityGroupIngress", "ec2:DeleteSecurityGroup"], action)]) > 0 ? {
-      ArnEquals = { "ec2:Vpc" = "arn:aws:ec2:${var.aws_region}:123456789012:vpc/${local.vpc_id}" }
+      ArnEquals = { "ec2:Vpc" = "arn:aws:ec2:${var.aws_region}:974402993422:vpc/${local.vpc_id}" }
     } : {})
   })]
 }
 resource "aws_iam_role" "controller" {
-  name               = "${local.cluster_name}-aws-load-balancer-controller"
-  assume_role_policy = data.aws_iam_policy_document.trust.json
+  name                 = "ghost-${local.cluster_name}-aws-load-balancer-controller"
+  permissions_boundary = "arn:aws:iam::974402993422:policy/GhostWorkloadBoundary"
+  assume_role_policy   = data.aws_iam_policy_document.trust.json
   lifecycle {
     precondition {
       condition     = local.cluster_name == "oneaction"
@@ -107,6 +107,13 @@ resource "aws_iam_role_policy" "controller" {
       Condition = { for operator, conditions in statement.Condition : operator => conditions if length(conditions) > 0 }
     } : {}
   )] })
+}
+resource "aws_eks_pod_identity_association" "controller" {
+  cluster_name    = local.cluster_name
+  namespace       = "kube-system"
+  service_account = "aws-load-balancer-controller"
+  role_arn        = aws_iam_role.controller.arn
+  depends_on      = [aws_iam_role_policy.controller]
 }
 output "cluster_name" { value = local.cluster_name }
 output "aws_region" { value = var.aws_region }

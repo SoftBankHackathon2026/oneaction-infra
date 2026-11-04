@@ -13,14 +13,14 @@ variable "aws_region" {
 provider "aws" {
   profile             = var.aws_profile == "" ? null : var.aws_profile
   region              = var.aws_region
-  allowed_account_ids = ["123456789012"]
+  allowed_account_ids = ["974402993422"]
   default_tags {
     tags = { Project = "oneaction", Owner = "hyeyeon.kim", Env = "dev" }
   }
 }
 locals {
   state_config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
     encrypt        = true
@@ -65,16 +65,23 @@ data "aws_iam_policy_document" "trust" {
     }
   }
 }
+# 팀 계정(974402993422)의 SSO 역할은 이름이 ghost- 로 시작하고 권한 경계 GhostWorkloadBoundary 가 붙은
+# IAM 역할만 만들 수 있다. 경계는 IAM 을 뺀 AWS 작업을 허용한다.
+locals {
+  iam_permissions_boundary = "arn:aws:iam::974402993422:policy/GhostWorkloadBoundary"
+}
+
 resource "aws_iam_role" "eso" {
-  name               = "oneaction-external-secrets"
-  assume_role_policy = data.aws_iam_policy_document.trust.json
+  name                 = "ghost-oneaction-external-secrets"
+  permissions_boundary = local.iam_permissions_boundary
+  assume_role_policy   = data.aws_iam_policy_document.trust.json
   lifecycle {
     precondition {
-      condition     = local.cluster_name == "oneaction" && local.cluster_arn == "arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction"
+      condition     = local.cluster_name == "oneaction" && local.cluster_arn == "arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction"
       error_message = "The EKS state must reference the team oneaction cluster."
     }
     precondition {
-      condition     = can(regex("^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:rds!db-", local.secret_arn))
+      condition     = can(regex("^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:rds!db-", local.secret_arn))
       error_message = "Use the existing RDS-managed Secret in the team account and region."
     }
     precondition {

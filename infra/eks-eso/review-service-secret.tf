@@ -1,13 +1,13 @@
 variable "review_service_secret_arn" {
   description = "Full ARN of the existing review-service Claude Secret. Null disables its read policy."
   type        = string
-  default     = "arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-GhIjKl"
+  default     = "arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-GhIjKl"
   validation {
     condition = var.review_service_secret_arn == null ? true : can(regex(
-      "^arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-[A-Za-z0-9]{6}$",
+      "^arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-[A-Za-z0-9]{6}$",
       var.review_service_secret_arn
     ))
-    error_message = "Use the full oneaction/review-service ARN in team account 123456789012 and Seoul, without wildcards."
+    error_message = "Use the full oneaction/review-service ARN in team account 974402993422 and Seoul, without wildcards."
   }
 }
 

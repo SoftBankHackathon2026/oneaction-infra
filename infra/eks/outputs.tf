@@ -27,10 +27,6 @@ output "node_role_arn" {
   value = aws_iam_role.node.arn
 }
 
-output "oidc_provider_arn" {
-  value = aws_iam_openid_connect_provider.cluster.arn
-}
-
 output "eks_log_group_name" {
   value = data.aws_cloudwatch_log_group.eks.name
 }

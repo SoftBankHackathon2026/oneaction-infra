@@ -13,11 +13,11 @@ import re
 from check_plan import check as check_existing_eso
 
 
-REVIEW_SECRET = "arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-GhIjKl"
-GITOPS_SECRET = "arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/gitops-token-AbCdEf"
-CLUSTER_ARN = "arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction"
-ROLE_NAME = "oneaction-external-secrets-argocd"
-ROLE_ARN = f"arn:aws:iam::123456789012:role/{ROLE_NAME}"
+REVIEW_SECRET = "arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-GhIjKl"
+GITOPS_SECRET = "arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/gitops-token-AbCdEf"
+CLUSTER_ARN = "arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction"
+ROLE_NAME = "ghost-oneaction-external-secrets-argocd"
+ROLE_ARN = f"arn:aws:iam::974402993422:role/{ROLE_NAME}"
 OPERATOR_NAMESPACE = "external-secrets"
 SERVICE_ACCOUNT = "external-secrets-argocd"
 TARGET_NAMESPACE = "argocd"
@@ -44,7 +44,7 @@ def check(plan, review_service_secret_arn=REVIEW_SECRET, gitops_token_secret_arn
 
     require(phase in {"create", "steady"}, "known deployment phase")
     require(isinstance(review_service_secret_arn, str) and re.fullmatch(
-        r"arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-[A-Za-z0-9]{6}",
+        r"arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-[A-Za-z0-9]{6}",
         review_service_secret_arn,
     ) is not None, "one exact review-service Secret ARN")
     changes = plan.get("resource_changes", [])
@@ -157,7 +157,7 @@ def check_negative_cases(plan, review_service_secret_arn, gitops_token_secret_ar
 
     def mutate_metadata(p):
         metadata = next(r for r in p["prior_state"]["values"]["root_module"]["resources"] if r["address"] == "data.aws_secretsmanager_secret.review_service[0]")
-        metadata["values"]["kms_key_id"] = "arn:aws:kms:ap-northeast-2:123456789012:key/unreviewed"
+        metadata["values"]["kms_key_id"] = "arn:aws:kms:ap-northeast-2:974402993422:key/unreviewed"
 
     cases = {
         "wrong AWS account": lambda p: p["configuration"]["provider_config"]["aws"]["expressions"]["allowed_account_ids"].update(constant_value=["111122223333"]),
@@ -168,7 +168,7 @@ def check_negative_cases(plan, review_service_secret_arn, gitops_token_secret_ar
         "Secret write": lambda p: mutate_policy(p, "Action", ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret", "secretsmanager:PutSecretValue"]),
         "multiple Secrets": lambda p: mutate_policy(p, "Resource", [review_service_secret_arn, gitops_token_secret_arn]),
         "missing region boundary": lambda p: mutate_policy(p, "Condition", {}),
-        "wrong policy role": lambda p: resource(p, POLICY)["change"]["after"].update(role="oneaction-external-secrets"),
+        "wrong policy role": lambda p: resource(p, POLICY)["change"]["after"].update(role="ghost-oneaction-external-secrets"),
         "wildcard ServiceAccount trust": lambda p: mutate_trust(p, "aws:RequestTag/kubernetes-service-account", "*"),
         "wrong namespace trust": lambda p: mutate_trust(p, "aws:RequestTag/kubernetes-namespace", "argocd"),
         "wrong cluster trust": lambda p: mutate_trust(p, "aws:RequestTag/eks-cluster-arn", "*"),

@@ -19,14 +19,14 @@ def check(plan, gitops_secret_arn=None, review_service_secret_arn=None):
 
     require(plan['terraform_version'] == '1.5.7', 'Terraform version')
     provider = plan['configuration']['provider_config']['aws']['expressions']
-    require(provider['allowed_account_ids']['constant_value'] == ['123456789012'], 'account guard')
+    require(provider['allowed_account_ids']['constant_value'] == ['974402993422'], 'account guard')
     require(plan['variables']['aws_region']['value'] == 'ap-northeast-2', 'region')
     require(plan['variables'].get('gitops_token_secret_arn', {}).get('value') == gitops_secret_arn, 'expected GitOps Secret input')
     if gitops_secret_arn is not None:
-        require(re.fullmatch(r'arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:[A-Za-z0-9/_+=.@-]+-[A-Za-z0-9]{6}', gitops_secret_arn) is not None, 'GitOps full Secret ARN')
+        require(re.fullmatch(r'arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:[A-Za-z0-9/_+=.@-]+-[A-Za-z0-9]{6}', gitops_secret_arn) is not None, 'GitOps full Secret ARN')
     require(plan['variables'].get('review_service_secret_arn', {}).get('value') == review_service_secret_arn, 'expected review-service Secret input')
     if review_service_secret_arn is not None:
-        require(re.fullmatch(r'arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-[A-Za-z0-9]{6}', review_service_secret_arn) is not None, 'review-service full Secret ARN')
+        require(re.fullmatch(r'arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-[A-Za-z0-9]{6}', review_service_secret_arn) is not None, 'review-service full Secret ARN')
     resources = {r['address']: r for r in plan['resource_changes'] if r['mode'] == 'managed'}
     expected_resources = {'aws_iam_role.eso', 'aws_iam_role_policy.read_rds', 'aws_eks_pod_identity_association.eso'}
     if gitops_secret_arn is not None:
@@ -47,16 +47,16 @@ def check(plan, gitops_secret_arn=None, review_service_secret_arn=None):
     for name in ['eks', 'database']:
         state = prior[f'data.terraform_remote_state.{name}']['config']
         require(state['key'] == f'dev/{name}/terraform.tfstate', 'state key')
-        require(state['bucket'] == 'oneaction-tfstate-123456789012' and state['region'] == 'ap-northeast-2', 'state account and region')
+        require(state['bucket'] == 'oneaction-tfstate-974402993422' and state['region'] == 'ap-northeast-2', 'state account and region')
         require(state['encrypt'] is True and state['dynamodb_table'] == 'oneaction-terraform-locks', 'state encryption and lock')
     cluster_arn = prior['data.terraform_remote_state.eks']['outputs']['cluster_arn']
     secret_arn = prior['data.terraform_remote_state.database']['outputs']['db_master_user_secret_arn']
-    require(cluster_arn == 'arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction', 'cluster ARN')
-    require(secret_arn.startswith('arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:rds!db-'), 'RDS Secret ARN')
+    require(cluster_arn == 'arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction', 'cluster ARN')
+    require(secret_arn.startswith('arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:rds!db-'), 'RDS Secret ARN')
     require(prior['data.aws_secretsmanager_secret.rds']['arn'] == secret_arn, 'Secret metadata matches database state')
     require(not prior['data.aws_secretsmanager_secret.rds'].get('kms_key_id'), 'unexpected customer-managed KMS key')
     role = resources['aws_iam_role.eso']['change']['after']
-    require(role['name'] == 'oneaction-external-secrets', 'role name')
+    require(role['name'] == 'ghost-oneaction-external-secrets', 'role name')
     trust = json.loads(role['assume_role_policy'])['Statement']
     require(len(trust) == 1 and trust[0]['Effect'] == 'Allow', 'trust statements')
     require(trust[0]['Principal'] == {'Service': 'pods.eks.amazonaws.com'}, 'Pod Identity principal')
@@ -176,11 +176,11 @@ if __name__ == '__main__':
                 'multiple Claude Secrets': lambda p: review_policy(p, 'Resource', [args.review_service_secret_arn, args.gitops_token_secret_arn]),
                 'Claude region removal': lambda p: review_policy(p, 'Condition', {}),
                 'other Claude role': lambda p: resource_change(p, 'aws_iam_role_policy.read_review_service[0]', 'role', 'other-role'),
-                'unreviewed Claude KMS key': lambda p: review_metadata(p, 'kms_key_id', 'arn:aws:kms:ap-northeast-2:123456789012:key/unreviewed'),
+                'unreviewed Claude KMS key': lambda p: review_metadata(p, 'kms_key_id', 'arn:aws:kms:ap-northeast-2:974402993422:key/unreviewed'),
                 'other Claude Secret metadata': lambda p: review_metadata(p, 'arn', args.review_service_secret_arn + 'other'),
                 'other Claude Secret name': lambda p: review_metadata(p, 'name', 'other-secret'),
                 'Claude policy replacement': lambda p: next(r for r in p['resource_changes'] if r['address'] == 'aws_iam_role_policy.read_review_service[0]')['change'].update(actions=['delete', 'create']),
-                'other account Claude ARN': lambda p: p['variables']['review_service_secret_arn'].update(value=args.review_service_secret_arn.replace('123456789012', '111122223333')),
+                'other account Claude ARN': lambda p: p['variables']['review_service_secret_arn'].update(value=args.review_service_secret_arn.replace('974402993422', '111122223333')),
                 'other region Claude ARN': lambda p: p['variables']['review_service_secret_arn'].update(value=args.review_service_secret_arn.replace('ap-northeast-2', 'us-east-1')),
             })
             if args.gitops_token_secret_arn is not None:
