@@ -1,0 +1,7 @@
+Local rendering only; no cluster connection or apply.
+Helm version: v3.19.0
+Chart: external-secrets 2.12.0 (https://charts.external-secrets.io)
+Platform: helm template with generated eso-platform-values.yaml and existing infra/eks-eso/scripts/post_renderer.py
+Notifications: helm template with generated eso-argocd-values.yaml
+Assertions: GCP service-account annotation, scoped namespace argument, no AWS_* environment variables, certificate-controller cluster role has no Secret access, notifications creates no CRDs.
+Result: platform render passed (40 resources); argocd render passed (6 resources).
