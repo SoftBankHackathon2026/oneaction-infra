@@ -20,9 +20,9 @@ variable "owner" {
 }
 
 variable "instance_type" {
-  description = "Subnet router instance. t4g.nano is enough for RDS/MSK client traffic."
+  description = "Subnet router instance. t4g.micro (1 GiB): on t4g.nano (512 MiB) the AL2023 `dnf install` in user_data is OOM-killed before tailscale is installed (seen 2026-11-05, i-0cd2d257bc10542fc)."
   type        = string
-  default     = "t4g.nano"
+  default     = "t4g.micro"
 }
 
 variable "tailscale_auth_key_secret_arn" {
