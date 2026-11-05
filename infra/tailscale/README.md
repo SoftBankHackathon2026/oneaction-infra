@@ -1,7 +1,7 @@
 # Tailscale subnet router (홈랩 k3s → RDS/MSK)
 
 온프렘 k3s 파드가 VPC 안의 RDS(5432)·MSK(9092)에 닿게 하는 경로입니다. 퍼블릭 엔드포인트를 열지 않고,
-VPC 안의 작은 EC2(`t4g.nano`, private 서브넷)가 tailnet에 `10.0.0.0/16`을 advertise 합니다.
+VPC 안의 작은 EC2(`t4g.micro`, private 서브넷)가 tailnet에 `10.0.0.0/16`을 advertise 합니다.
 
 ```
 k3s 노드 (tailscale --accept-routes)  ──tailnet──>  oneaction-aws-router (EC2, source/dest check off, SNAT)
@@ -35,4 +35,4 @@ terraform apply tfplan
 - `--ssh=false`, `--accept-dns=false`. 라우터는 포워딩만 합니다.
 
 ## 비용
-t4g.nano 온디맨드 약 $3/월 + EBS 8GiB. NAT 통과 트래픽은 기존 NAT 요금.
+t4g.micro 온디맨드 약 $6/월 + EBS 8GiB (t4g.nano 는 user_data 의 dnf 가 OOM 으로 죽어 tailscale 이 설치되지 않음, 2026-11-05 확인). NAT 통과 트래픽은 기존 NAT 요금.
