@@ -49,3 +49,16 @@ terraform apply tfplan
 
 ## 비용
 t4g.micro 온디맨드 약 $6/월 + EBS 8GiB (t4g.nano 는 user_data 의 dnf 가 OOM 으로 죽어 tailscale 이 설치되지 않음, 2026-11-05 확인). NAT 통과 트래픽은 기존 NAT 요금.
+
+## 설정 바꾸기 (실행 중인 라우터)
+
+`user_data` 는 첫 부팅에만 실행되고, Terraform 은 `user_data` 변경으로 라우터를 다시 만들지 않습니다(`ignore_changes`).
+실행 중인 라우터의 tailscale 설정은 SSM Run Command 로 맞춥니다. SSH 나 수신 포트는 열지 않습니다.
+
+```bash
+ID=$(terraform -chdir=infra/tailscale output -raw instance_id)
+aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
+  --parameters 'commands=["tailscale set --accept-routes=true","tailscale status --peers=false"]'
+```
+
+2026-11-05 에 `--accept-routes` 를 이 방법으로 켰습니다(`tailnet_routes` 의 VPC → 홈랩 경로용).
