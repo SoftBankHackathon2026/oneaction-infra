@@ -46,12 +46,13 @@ variable "advertise_routes" {
 
 variable "tailnet_routes" {
   description = <<-EOT
-    VPC 에서 라우터를 거쳐 tailnet 으로 보낼 대역. EKS 의 플랫폼 수집기가 온프렘 kube API(172.30.1.10:6443)와
-    워커·Connect NodePort 에 닿는 데 쓴다. GCP 라우터가 붙으면 10.20.32.0/19 등 GCP 대역을 더한다.
+    VPC 에서 라우터를 거쳐 tailnet 으로 보낼 대역. EKS 의 플랫폼 수집기가 온프렘 k3s 노드 두 대의 kube API(6443)와
+    상태 프록시 노드 포트(30880)에 닿는 데 쓴다. 홈랩 LAN 전체(공유기·Proxmox 관리 화면 등)가 VPC 에서 보이지
+    않도록 노드 주소(/32)만 둔다. GCP 라우터가 붙으면 필요한 GCP 대역을 더한다.
     빈 목록이면 기존처럼 tailnet → VPC 한 방향만 연다.
   EOT
   type        = list(string)
-  default     = ["172.30.1.0/24"]
+  default     = ["172.30.1.10/32", "172.30.1.7/32"]
 
   validation {
     condition     = alltrue([for cidr in var.tailnet_routes : can(cidrnetmask(cidr)) && !startswith(cidr, "10.0.")])

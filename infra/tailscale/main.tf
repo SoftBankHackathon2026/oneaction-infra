@@ -82,11 +82,12 @@ resource "aws_iam_instance_profile" "router" {
 # ---- Network: private subnet, egress through NAT (Tailscale uses outbound UDP/HTTPS only)
 resource "aws_security_group" "router" {
   name        = "tailscale-router-sg"
-  description = "Tailscale subnet router: forwards tailnet traffic into the VPC and VPC traffic to tailnet routes"
+  description = "Tailscale subnet router: no inbound, forwards tailnet traffic into the VPC"
   vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
 
   # VPC 안(EKS 플랫폼 수집기 등)에서 온프렘·GCP 로 가는 트래픽이 라우터 ENI 로 들어온다.
   # 라우터 자신은 수신 포트를 열지 않는다 (tailscaled 는 바깥으로만 연결한다).
+  # description 은 바꾸지 않는다. 바꾸면 SG 가 교체되어 실행 중인 라우터가 끊긴다.
   dynamic "ingress" {
     for_each = length(var.tailnet_routes) > 0 ? [1] : []
     content {
@@ -156,12 +157,19 @@ resource "aws_instance" "router" {
 
   tags = { Name = "oneaction-tailscale-router" }
 
+  # user_data 는 첫 부팅에만 실행되므로, 바꾸면 인스턴스를 새로 만든다. 새 라우터가 먼저 떠서 같은 경로를
+  # 광고한 뒤 옛 라우터를 지우므로(create_before_destroy) 홈랩 → RDS·MSK 경로가 거의 끊기지 않는다.
+  # 옛 장치는 tailnet 에 오프라인으로 남으니 Tailscale 관리 콘솔에서 지운다.
+  user_data_replace_on_change = true
+
   lifecycle {
-    ignore_changes = [ami] # pinned at first apply; replace deliberately
+    ignore_changes        = [ami] # pinned at first apply; replace deliberately
+    create_before_destroy = true
   }
 }
 
-# ---- VPC → tailnet: 온프렘 LAN(172.30.1.0/24, proxmox-exit 가 광고)과 GCP 대역을 라우터로 보낸다.
+# ---- VPC → tailnet: 온프렘 k3s 노드(172.30.1.10·.7, proxmox-exit 의 172.30.1.0/24 광고 안)와 GCP 대역을 라우터로 보낸다.
+# VPC 라우팅 테이블에는 노드 주소만 넣어 홈랩 LAN 의 다른 장비로 가는 경로는 만들지 않는다.
 # 라우터가 --accept-routes 로 받은 경로로 넘기고, 온프렘 쪽은 proxmox-exit 가 SNAT 하므로 LAN 에는 경로를 더하지 않는다.
 # private 라우팅 테이블은 network 스택이 별도 aws_route 로 관리하므로 여기서 aws_route 를 더해도 덮어쓰이지 않는다.
 resource "aws_route" "tailnet" {

@@ -7,12 +7,13 @@ VPC 안의 작은 EC2(`t4g.micro`, private 서브넷)가 tailnet에 `10.0.0.0/16
 k3s 노드 (tailscale --accept-routes)  ──tailnet──>  oneaction-aws-router (EC2, source/dest check off, SNAT)
                                                       └─> RDS 5432 · MSK 9092  (출발지는 라우터 IP, EKS 서브넷)
 
-EKS Pod (플랫폼 수집기 등) ─ VPC 라우팅 172.30.1.0/24 → 라우터 ENI ─ tailnet ─> proxmox-exit (SNAT) ─> 홈랩 LAN
-                                                      └─> k3s API 6443 · 워커/Connect NodePort 30880/30883
+EKS Pod (플랫폼 수집기 등) ─ VPC 라우팅 172.30.1.10/32·.7/32 → 라우터 ENI ─ tailnet ─> proxmox-exit (SNAT) ─> k3s 노드
+                                                      └─> k3s API 6443 · 상태 프록시 NodePort 30880 (읽기 전용)
 ```
 
-반대 방향(AWS → 홈랩)은 `tailnet_routes`(기본 `["172.30.1.0/24"]`)로 엽니다. 라우터가 `--accept-routes`로
-proxmox-exit 의 `172.30.1.0/24` 광고를 받고, VPC private 라우팅 테이블에 그 대역 → 라우터 ENI 경로를 더합니다.
+반대 방향(AWS → 홈랩)은 `tailnet_routes`(기본 k3s 노드 두 대 `["172.30.1.10/32", "172.30.1.7/32"]`)로 엽니다.
+라우터가 `--accept-routes`로 proxmox-exit 의 `172.30.1.0/24` 광고를 받고, VPC private 라우팅 테이블에는 노드 주소만
+라우터 ENI 로 보냅니다. 공유기·Proxmox 관리 화면 같은 홈랩 LAN 의 다른 장비로 가는 VPC 경로는 만들지 않습니다.
 홈랩 쪽은 proxmox-exit 가 SNAT 하므로 LAN 장비에 경로를 추가하지 않습니다. 한 방향만 쓰려면 `tailnet_routes = []`.
 
 ## 적용 전 준비
@@ -41,8 +42,10 @@ terraform apply tfplan
   Tailscale ACL에서 `10.0.0.0/16` 접근을 홈랩 k3s 노드 태그로만 제한하세요.
 - IAM은 auth key Secret 하나의 `GetSecretValue`만. IMDSv2 필수, 루트 볼륨 암호화.
 - `--ssh=false`, `--accept-dns=false`. 라우터는 포워딩만 합니다.
-- AWS → 홈랩 경로를 열면 VPC 안의 모든 장치가 홈랩 LAN `172.30.1.0/24`에 닿습니다. 홈랩에서 열어 둘 포트는
-  k3s API와 플랫폼용 NodePort 로 한정하고, 필요하면 Tailscale ACL grant 로 `tag:aws-subnet-router` → `172.30.1.10:6443,30880,30883`만 허용하세요.
+- AWS → 홈랩 경로는 k3s 노드 두 대(`/32`)만 VPC 라우팅에 올립니다. 노드에서 VPC 로 열리는 포트는 k3s API(인증 필요)와
+  읽기 전용 상태 프록시(gitops `apps/platform-status-proxy`, GET 두 경로만)입니다. 워커 제어 API·Kafka Connect REST 는 열지 않습니다.
+- 라우터 자체는 `172.30.1.0/24` 전체를 받으므로, 라우터 인스턴스가 탈취되면 홈랩 LAN 전체에 닿을 수 있습니다. 더 줄이려면
+  Tailscale 접근 정책 grant 로 `tag:aws-subnet-router` → `172.30.1.10,172.30.1.7` 포트 6443·30880만 허용합니다.
 
 ## 비용
 t4g.micro 온디맨드 약 $6/월 + EBS 8GiB (t4g.nano 는 user_data 의 dnf 가 OOM 으로 죽어 tailscale 이 설치되지 않음, 2026-11-05 확인). NAT 통과 트래픽은 기존 NAT 요금.
