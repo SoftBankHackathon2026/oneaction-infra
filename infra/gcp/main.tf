@@ -131,3 +131,19 @@ module "observability" {
   notification_email = var.notification_email
   depends_on         = [google_project_service.required]
 }
+
+module "tailscale" {
+  count              = var.enable_tailscale && var.tailscale_auth_key_secret_id != "" ? 1 : 0
+  source             = "./tailscale"
+  project_id         = var.project_id
+  name               = local.name
+  labels             = local.labels
+  zone               = local.zones[0]
+  machine_type       = var.tailscale_machine_type
+  network_id         = module.network.network_id
+  subnet_id          = module.network.gke_subnet_id
+  auth_key_secret_id = var.tailscale_auth_key_secret_id
+  advertise_routes   = ["10.20.32.0/19", "10.20.10.0/24", "10.20.128.0/20"]
+  # The private VM needs NAT for packages and the Tailscale control plane.
+  depends_on = [module.network, google_project_service.required]
+}

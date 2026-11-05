@@ -25,6 +25,10 @@ run "private_compute" {
     condition     = google_container_node_pool.this.node_config[0].workload_metadata_config[0].mode == "GKE_METADATA" && google_container_node_pool.this.node_config[0].disk_size_gb == 20
     error_message = "Workloads must use GKE metadata and the AWS-equivalent 20 GiB node disks."
   }
+  assert {
+    condition     = google_container_cluster.this.addons_config[0].gce_persistent_disk_csi_driver_config[0].enabled
+    error_message = "Persistent volumes need the managed GCE PD CSI driver."
+  }
 }
 
 run "private_database" {
@@ -54,6 +58,10 @@ run "private_database" {
   assert {
     condition     = google_sql_user.review.password == null && google_sql_user.review.password_wo_version == 2
     error_message = "The persisted password field must be empty; use the versioned write-only argument."
+  }
+  assert {
+    condition     = contains([for flag in google_sql_database_instance.this.settings[0].database_flags : "${flag.name}=${flag.value}"], "cloudsql.logical_decoding=on")
+    error_message = "The database must support logical change capture like the AWS source."
   }
 }
 
@@ -108,5 +116,13 @@ run "load_balancer_errors_are_monitored" {
   assert {
     condition     = google_monitoring_alert_policy.lb_5xx.conditions[0].condition_threshold[0].threshold_value == 0
     error_message = "The AWS ALB 5xx alarm needs a GCP load-balancer equivalent."
+  }
+  assert {
+    condition     = strcontains(google_logging_metric.lb_5xx.filter, "jsonPayload.statusDetails!=\"response_sent_by_backend\"") && strcontains(google_monitoring_alert_policy.this["nat_drops"].conditions[0].condition_threshold[0].filter, "OUT_OF_RESOURCES")
+    error_message = "Backend application errors and unrelated NAT drops must not be mislabeled as infrastructure failures."
+  }
+  assert {
+    condition     = strcontains(google_monitoring_alert_policy.sql_free_storage.conditions[0].condition_prometheus_query_language[0].query, "database/disk/quota") && strcontains(google_monitoring_alert_policy.sql_free_storage.conditions[0].condition_prometheus_query_language[0].query, "database/disk/bytes_used") && strcontains(google_monitoring_alert_policy.sql_free_storage.conditions[0].condition_prometheus_query_language[0].query, "< 4294967296")
+    error_message = "Free-storage warnings must preserve AWS's byte threshold after disk auto-resizing."
   }
 }

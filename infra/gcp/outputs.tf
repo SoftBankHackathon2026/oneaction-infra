@@ -16,5 +16,6 @@ output "platform" {
     identities       = module.secrets.identities
     dns_name_servers = module.dns.name_servers
     alert_policies   = module.observability.alert_policy_names
+    tailscale        = try(module.tailscale[0].contract, null)
   }
 }

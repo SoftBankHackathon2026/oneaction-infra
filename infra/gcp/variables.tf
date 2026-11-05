@@ -159,3 +159,32 @@ variable "kafka_memory_gib" {
     error_message = "Use an integer Kafka memory size between 1 and 8 GiB per vCPU."
   }
 }
+
+variable "enable_tailscale" {
+  description = "Enable the private on-prem subnet router. Required for the full AWS-equivalent scope; false preserves the original draft inputs."
+  type        = bool
+  default     = false
+}
+variable "tailscale_auth_key_secret_id" {
+  description = "Existing Secret Manager secret ID in project_id; never the auth key value."
+  type        = string
+  default     = ""
+  validation {
+    condition     = !var.enable_tailscale || can(regex("^[a-zA-Z0-9_-]{1,255}$", var.tailscale_auth_key_secret_id))
+    error_message = "Full deployment needs the existing Tailscale auth-key secret ID."
+  }
+}
+variable "tailscale_machine_type" {
+  description = "Private router machine type; compare with the actual AWS t4g.nano router before applying."
+  type        = string
+  default     = "e2-micro"
+}
+variable "require_full_scope" {
+  description = "Reject an incomplete full-scope deployment rather than silently omitting AWS counterparts."
+  type        = bool
+  default     = false
+  validation {
+    condition     = !var.require_full_scope || (var.enable_kafka && var.enable_tailscale && var.domain_name != "" && var.notification_email != "")
+    error_message = "Full scope requires Kafka, Tailscale, a real domain, and an alert email. Prepare the inputs before applying."
+  }
+}

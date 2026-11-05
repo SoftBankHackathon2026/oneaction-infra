@@ -46,6 +46,7 @@ resource "google_container_cluster" "this" {
   workload_identity_config { workload_pool = "${var.project_id}.svc.id.goog" }
   addons_config {
     http_load_balancing { disabled = false }
+    gce_persistent_disk_csi_driver_config { enabled = true }
     gcp_filestore_csi_driver_config { enabled = false }
   }
   logging_config { enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS", "APISERVER", "SCHEDULER", "CONTROLLER_MANAGER"] }

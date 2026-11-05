@@ -28,6 +28,12 @@ resource "google_sql_database_instance" "this" {
       name  = "log_min_duration_statement"
       value = "1000"
     }
+    # Counterpart of the AWS rds.logical_replication parameter. Applied on
+    # instance creation so CDC does not require an avoidable later restart.
+    database_flags {
+      name  = "cloudsql.logical_decoding"
+      value = "on"
+    }
   }
   lifecycle {
     precondition {

@@ -3,6 +3,17 @@ resource "google_compute_network" "this" {
   auto_create_subnetworks = false
   routing_mode            = "REGIONAL"
 }
+# Materialize the implicit ingress deny so rejected traffic is logged. GKE's
+# controller-owned rules have a higher precedence and remain the allow source.
+resource "google_compute_firewall" "unmatched_ingress" {
+  name          = "${var.name}-deny-unmatched-ingress"
+  network       = google_compute_network.this.id
+  direction     = "INGRESS"
+  priority      = 65534
+  source_ranges = ["0.0.0.0/0"]
+  deny { protocol = "all" }
+  log_config { metadata = "INCLUDE_ALL_METADATA" }
+}
 resource "google_compute_subnetwork" "gke" {
   name                     = "${var.name}-gke"
   region                   = var.region
