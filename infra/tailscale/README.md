@@ -61,4 +61,11 @@ aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
   --parameters 'commands=["tailscale set --accept-routes=true","tailscale status --peers=false"]'
 ```
 
-2026-11-05 에 `--accept-routes` 를 이 방법으로 켰습니다(`tailnet_routes` 의 VPC → 홈랩 경로용).
+2026-11-06 에 실행 중인 라우터에 이 방법으로 두 가지를 넣었습니다(`tailnet_routes` 의 VPC → 홈랩 경로용).
+
+- `tailscale set --accept-routes=true`: proxmox-exit 의 `172.30.1.0/24` 광고를 받는다
+- `oneport-tailnet-snat.service`: VPC → tailnet 트래픽을 라우터의 tailnet 주소로 SNAT 한다. proxmox-exit 는
+  `10.0.0.0/16` 경로를 받지 않아서, 출발지가 VPC 주소면 홈랩의 응답이 돌아오지 못한다. 라우터를 새로 만들 때는
+  `user_data` 가 같은 서비스를 만든다
+
+확인: EKS 의 Pod 에서 `curl http://172.30.1.10:30880/worker/status` 가 200, 홈랩 k3s 노드에서 RDS 5432 가 열려 있다.

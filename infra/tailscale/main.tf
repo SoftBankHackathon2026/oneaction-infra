@@ -160,6 +160,25 @@ resource "aws_instance" "router" {
       --advertise-routes=${join(",", var.advertise_routes)} --snat-subnet-routes=true \
       --accept-routes=${length(var.tailnet_routes) > 0} --accept-dns=false --ssh=false
     unset AUTH_KEY
+    # VPC 에서 tailnet 으로 나가는 트래픽(플랫폼 수집기 → 홈랩)을 라우터의 tailnet 주소로 바꾼다.
+    # 홈랩 서브넷 라우터(proxmox-exit)는 10.0.0.0/16 경로를 받지 않으므로, 출발지가 VPC 주소면 응답이 돌아오지 못한다.
+    cat >/etc/systemd/system/oneport-tailnet-snat.service <<'UNIT'
+    [Unit]
+    Description=SNAT VPC traffic into the tailnet so tailnet subnet routers can reply
+    After=tailscaled.service network-online.target
+    Wants=tailscaled.service
+
+    [Service]
+    Type=oneshot
+    RemainAfterExit=yes
+    ExecStart=/bin/sh -c 'iptables -t nat -C POSTROUTING -s ${data.aws_vpc.this.cidr_block} -o tailscale0 -j MASQUERADE 2>/dev/null || iptables -t nat -I POSTROUTING 1 -s ${data.aws_vpc.this.cidr_block} -o tailscale0 -j MASQUERADE'
+    ExecStop=/bin/sh -c 'iptables -t nat -D POSTROUTING -s ${data.aws_vpc.this.cidr_block} -o tailscale0 -j MASQUERADE 2>/dev/null || true'
+
+    [Install]
+    WantedBy=multi-user.target
+    UNIT
+    systemctl daemon-reload
+    systemctl enable --now oneport-tailnet-snat.service
   EOT
 
   tags = { Name = "oneaction-tailscale-router" }
