@@ -1,0 +1,12 @@
+{
+  "project_id": "ghost-project-513812",
+  "cluster": "oneaction-dev",
+  "pod_phase": "Succeeded",
+  "pvc_phase": "Bound",
+  "storage_class": "standard-rwo",
+  "volume": "pvc-398c015b-4e12-4348-beb8-c60d21c16548",
+  "capacity": {
+    "storage": "1Gi"
+  },
+  "logs": "Server:\t\t10.28.0.10\nAddress:\t10.28.0.10:53\n\n\nNon-authoritative answer:\nName:\tstorage.googleapis.com\nAddress: 34.128.10.123\nName:\tstorage.googleapis.com\nAddress: 34.128.10.91\nName:\tstorage.googleapis.com\nAddress: 34.128.9.251\nName:\tstorage.googleapis.com\nAddress: 34.128.9.187\n\ngcp-persistent-disk-ok\n"
+}

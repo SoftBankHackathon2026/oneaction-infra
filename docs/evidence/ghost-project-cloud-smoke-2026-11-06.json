@@ -1,0 +1,51 @@
+{
+  "observed_at_utc": "2026-11-05T15:57:46.141466+00:00",
+  "project_id": "ghost-project-513812",
+  "infra-cloud-smoke": {
+    "succeeded": 1,
+    "checks": [
+      {
+        "gcs_read_ok": true,
+        "prefix_count": 6,
+        "workload_identity": "oneaction-dev-a740-review@ghost-project-513812.iam.gserviceaccount.com"
+      },
+      {
+        "kafka_authentication_ok": true,
+        "broker_count": 3,
+        "topic_count": 2
+      }
+    ]
+  },
+  "infra-kafka-messages": {
+    "succeeded": 1,
+    "checks": [
+      {
+        "gcs_read_ok": true,
+        "prefix_count": 6,
+        "workload_identity": "oneaction-dev-a740-review@ghost-project-513812.iam.gserviceaccount.com"
+      },
+      {
+        "kafka_produce_consume_ok": true,
+        "partition": 0,
+        "offset": 0,
+        "acks": "all",
+        "replication_factor": 3,
+        "min_insync_replicas": 2
+      }
+    ]
+  },
+  "external_ingress": {
+    "status_code": 200,
+    "url": "http://34.149.47.248/healthz",
+    "body": "oneaction-gcp-infrastructure-smoke",
+    "temporary_backend": true
+  },
+  "cleanup": {
+    "jobs": "job.batch \"infra-cloud-smoke\" deleted from platform namespace\njob.batch \"infra-kafka-messages\" deleted from platform namespace\n",
+    "deployment": "deployment.apps \"infra-http-smoke\" deleted from platform namespace\n",
+    "pod": "pod \"infra-ingress-client\" deleted from platform namespace\n",
+    "topic_deleted": true,
+    "storage_probe_previously_deleted": true,
+    "sql_probe_previously_deleted": true
+  }
+}

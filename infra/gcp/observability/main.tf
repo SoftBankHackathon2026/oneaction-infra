@@ -106,7 +106,8 @@ resource "google_monitoring_alert_policy" "lb_5xx" {
   conditions {
     display_name = "GKE Ingress server errors"
     condition_threshold {
-      filter          = "resource.type = \"http_load_balancer\" AND metric.type = \"logging.googleapis.com/user/${google_logging_metric.lb_5xx.name}\""
+      # Logging's http_load_balancer maps to l7_lb_rule for logs-based metrics.
+      filter          = "resource.type = \"l7_lb_rule\" AND metric.type = \"logging.googleapis.com/user/${google_logging_metric.lb_5xx.name}\""
       comparison      = "COMPARISON_GT"
       threshold_value = 0
       duration        = "60s"

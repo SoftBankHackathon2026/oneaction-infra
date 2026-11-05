@@ -35,12 +35,17 @@ variable "owner" {
   default = "platform"
 
 }
+variable "allow_public_control_plane" {
+  type        = bool
+  default     = false
+  description = "Explicit test-environment opt-in to broad GKE administrator network access; authentication still applies."
+}
 variable "public_access_cidrs" {
   type        = set(string)
   description = "Explicit administrator IPv4 egress allowlist."
   validation {
-    condition     = length(var.public_access_cidrs) > 0 && alltrue([for cidr in var.public_access_cidrs : can(cidrnetmask(cidr)) && try(tonumber(split("/", cidr)[1]) >= 24, false)])
-    error_message = "Supply at least one IPv4 /24 or narrower CIDR; prefer /32."
+    condition     = length(var.public_access_cidrs) > 0 && alltrue([for cidr in var.public_access_cidrs : can(cidrnetmask(cidr)) && (var.allow_public_control_plane || try(tonumber(split("/", cidr)[1]) >= 24, false))])
+    error_message = "Supply at least one IPv4 /24 or narrower CIDR; broader access requires explicit allow_public_control_plane test opt-in."
   }
 }
 variable "admin_members" {
@@ -186,5 +191,15 @@ variable "require_full_scope" {
   validation {
     condition     = !var.require_full_scope || (var.enable_kafka && var.enable_tailscale && var.domain_name != "" && var.notification_email != "")
     error_message = "Full scope requires Kafka, Tailscale, a real domain, and an alert email. Prepare the inputs before applying."
+  }
+}
+
+variable "kafka_bootstrap_brokers" {
+  description = "Actual Kafka bootstrapAddress including port, queried after creation; never inferred from the cluster ID."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.kafka_bootstrap_brokers == null ? true : can(regex("^[a-zA-Z0-9.-]+:9092$", var.kafka_bootstrap_brokers))
+    error_message = "Use the actual Kafka bootstrap hostname followed by :9092."
   }
 }

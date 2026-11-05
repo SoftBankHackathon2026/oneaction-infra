@@ -1,5 +1,52 @@
 mock_provider "google" {}
 
+run "kafka_uses_project_number_in_subnet_path" {
+  command = plan
+  module { source = "./kafka" }
+  override_data {
+    target = data.google_project.this[0]
+    values = { number = "123456789" }
+  }
+  variables {
+    project_id        = "oneaction-test-123"
+    region            = "asia-northeast3"
+    name              = "oneaction-dev"
+    labels            = { project = "oneaction" }
+    enabled           = true
+    subnet_id         = "projects/oneaction-test-123/regions/asia-northeast3/subnetworks/data"
+    vcpu_count        = 4
+    memory_gib        = 4
+    bootstrap_brokers = "bootstrap-issued.example.cloud.goog:9092"
+  }
+  assert {
+    condition     = one(one(one(google_managed_kafka_cluster.this[0].gcp_config).access_config).network_configs).subnet == "projects/123456789/regions/asia-northeast3/subnetworks/data"
+    error_message = "Managed Kafka must receive the project-number form of the Compute subnet path."
+  }
+  assert {
+    condition     = output.contract.bootstrap_brokers == "bootstrap-issued.example.cloud.goog:9092"
+    error_message = "The deployment contract must preserve the actual queried bootstrap endpoint."
+  }
+}
+
+run "kafka_does_not_invent_bootstrap_address" {
+  command = plan
+  module { source = "./kafka" }
+  variables {
+    project_id = "oneaction-test-123"
+    region     = "asia-northeast3"
+    name       = "oneaction-dev"
+    labels     = {}
+    enabled    = true
+    subnet_id  = "projects/123456789/regions/asia-northeast3/subnetworks/data"
+    vcpu_count = 4
+    memory_gib = 4
+  }
+  assert {
+    condition     = output.contract.bootstrap_brokers == null
+    error_message = "Unknown bootstrap addresses must stay null, rather than use a legacy naming convention."
+  }
+}
+
 run "private_compute" {
   command = plan
   module { source = "./gke" }
@@ -112,6 +159,10 @@ run "load_balancer_errors_are_monitored" {
     database_name      = "oneaction-dev-review"
     logs_bucket        = "oneaction-test-logs"
     notification_email = "platform@example.com"
+  }
+  assert {
+    condition     = strcontains(google_monitoring_alert_policy.lb_5xx.conditions[0].condition_threshold[0].filter, "l7_lb_rule") && strcontains(google_logging_metric.lb_5xx.filter, "http_load_balancer")
+    error_message = "Google uses different Logging and Monitoring resource types for load-balancer log metrics."
   }
   assert {
     condition     = google_monitoring_alert_policy.lb_5xx.conditions[0].condition_threshold[0].threshold_value == 0

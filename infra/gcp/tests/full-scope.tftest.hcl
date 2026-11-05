@@ -1,5 +1,19 @@
 mock_provider "google" {}
 
+run "explicit_test_public_control_plane" {
+  command = plan
+  variables {
+    project_id                 = "oneaction-test-123"
+    public_access_cidrs        = ["0.0.0.0/0"]
+    allow_public_control_plane = true
+    db_password                = "unit-test-only-not-a-real-password"
+  }
+  assert {
+    condition     = contains(module.gke.contract.public_access_cidrs, "0.0.0.0/0")
+    error_message = "An explicitly approved test profile may allow all administrator source addresses."
+  }
+}
+
 run "reject_partial_full_scope" {
   command = plan
   variables {

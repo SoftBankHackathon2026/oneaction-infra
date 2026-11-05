@@ -30,3 +30,9 @@ variable "memory_gib" {
   type = number
 
 }
+
+variable "bootstrap_brokers" {
+  description = "Actual bootstrapAddress from clusters describe, including port; null until queried after creation."
+  type        = string
+  default     = null
+}

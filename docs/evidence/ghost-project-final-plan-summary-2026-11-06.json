@@ -1,0 +1,18 @@
+{
+  "project_id": "ghost-project-513812",
+  "changes": [
+    {
+      "address": "module.gke.google_project_iam_member.admins[\"user:nate.crema@gmail.com\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "module.observability.google_monitoring_alert_policy.lb_5xx",
+      "actions": [
+        "create"
+      ]
+    }
+  ],
+  "destructive": false
+}

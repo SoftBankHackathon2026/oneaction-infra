@@ -8,7 +8,7 @@
 - GCP는 `infra/gcp`라는 별도 Terraform 진입점과 Cloud Storage 상태를 사용합니다. AWS 상태를 옮기거나 기존 리소스를 GCP로 바꾸지 않습니다.
 - 클라우드 리소스는 공급자(provider)가 달라 분리했습니다. 구성 단위·문서 버킷 경로·데이터베이스 이름·Kubernetes 시크릿 키는 기존 구성을 유지합니다.
 - 기존 `infra/eks-eso/helm-values*.yaml`과 권한 보정 도구 `post_renderer.py`는 재사용합니다. 생성기가 AWS 환경변수를 제거하고 GCP Workload Identity 연결만 추가합니다.
-- 실제 클라우드 생성·데이터 이전·애플리케이션 배포는 수행하지 않았습니다. 모의 공급자 시험은 API 호출 없이 계획의 스키마와 설정값을 검사합니다.
+- 실제 클라우드 생성·연결 검증의 현재 상태는 배포 기록을 따릅니다. 업무 앱과 데이터 이전은 별도 범위입니다. 모의 공급자 시험은 API 호출 없이 계획의 스키마와 설정값만 검사합니다.
 
 ## AWS와의 대응
 
@@ -45,13 +45,14 @@
 - Terraform 1.11 이상 2 미만(검증 버전 1.13.5), Google 공급자 7.29.x(잠금 파일 7.29.0), Python 3.9 이상.
 - `gcloud`, `kubectl`, Helm 3. 기존 권한 보정 도구는 Helm 3의 post-renderer 옵션을 사용합니다.
 - 요금 결제가 연결된 실제 GCP 프로젝트, 서비스 활성화와 해당 리소스·권한·상태 버킷을 관리할 배포자 권한. 상태 저장 버킷 접근은 배포자에게만 별도로 부여하고 워크로드에는 주지 않습니다.
+- 전체 배포에는 프로젝트·서비스 계정·비밀정보·버킷 권한 설정, Service Networking 사설 연결, 로그 내보내기 설정 권한이 필요합니다. Helm 설치에는 `roles/container.admin` 등 Kubernetes 권한 규칙을 생성할 권한도 확인합니다. 기본 편집자 역할만으로는 이 작업들이 모두 허용되지 않습니다.
 - 배포자는 노드 계정을 지정할 `iam.serviceAccounts.actAs` 권한도 필요합니다. `admin_members`는 클러스터 관리자용이며 Terraform 실행자 권한을 대신하지 않습니다.
 - `gcloud auth application-default login`으로 로컬 Terraform용 인증을 준비합니다. `gcloud` 명령용 로그인도 별도 확인합니다. 서비스 계정 키 파일은 만들지 않습니다.
 - 리전별 영역·GKE 버전·SQL/Kafka 지원·할당량은 실제 프로젝트에서 확인합니다. AWS Kubernetes `1.36`을 강제 복사하지 않고 GKE `REGULAR` 출시 채널의 지원 버전을 사용합니다.
 
 ## 적용 순서
 
-아래 명령은 운영자가 실제 생성할 때 실행하는 절차입니다. 이 변경에서 실행한 명령은 검증 절의 명령뿐입니다.
+아래는 실제 생성 절차입니다. 이번 테스트 환경에서 실행한 결과와 아직 남은 구성은 현재 배포 기록에서 구분합니다.
 
 1. 상태 저장 버킷을 별도 구성으로 준비합니다. 아래 예시의 프로젝트와 버킷 이름은 실제 값으로 바꿉니다.
 
@@ -132,7 +133,7 @@
 
 - Managed Kafka는 AWS 코드의 `PLAINTEXT` 무인증 접속을 지원하지 않습니다. `platform.kafka`에 `SASL_SSL`, `OAUTHBEARER`, 비밀 키 없는 기본 인증 정보(ADC, Application Default Credentials) 사용을 출력합니다.
 - `platform.identities.workload`에는 `roles/managedkafka.client`를 부여합니다. GKE의 연결된 서비스 계정을 쓰되 클라이언트 라이브러리에 OAuth 토큰 자동 갱신 기능을 연결해야 합니다. 기존 앱이 `KAFKA_BOOTSTRAP`만 지원하면 주소 변경만으로 작동하지 않습니다. 앱 소스 변경은 이 저장소 범위 밖입니다.
-- 공급자 7.29는 실제 bootstrap 주소 속성을 노출하지 않아 출력은 문서의 기본 주소 형식으로 구성합니다. **실제 사용 전 아래 조회 결과와 일치하는지 반드시 확인**하고 다르면 실제 조회값을 클라이언트에 사용합니다.
+- 공급자 7.29는 실제 bootstrap 주소 속성을 노출하지 않으므로, 조회 전에는 출력 주소를 `null`로 둡니다. 생성 후 아래 명령으로 조회한 실제 주소를 `kafka_bootstrap_brokers`에 입력하고 다시 계획·적용해 출력 계약에 반영합니다. 주소 형식은 클러스터마다 다르므로 이름으로 추측하지 않습니다.
 
   ```bash
   gcloud managed-kafka clusters describe oneaction-dev-review \
@@ -181,3 +182,10 @@ terraform -chdir=infra/gcp/bootstrap validate
 - [Kafka 클러스터 용량과 네트워크](https://docs.cloud.google.com/managed-service-for-apache-kafka/docs/create-cluster)
 - [Kafka 인증과 클라이언트 역할](https://docs.cloud.google.com/managed-service-for-apache-kafka/docs/authentication-kafka)
 - [실제 Kafka bootstrap 주소 조회](https://docs.cloud.google.com/managed-service-for-apache-kafka/docs/view-cluster)
+
+## ghost-project 테스트 환경 설정
+
+- 사용자 지시로 `allow_public_control_plane=true`, `public_access_cidrs=["0.0.0.0/0"]`을 명시합니다. 일반 기본값은 좁은 주소만 허용하며 계정 인증은 유지됩니다.
+- Kafka는 Compute 서브넷 경로의 프로젝트 ID를 프로젝트 번호로 정규화합니다. 실제 API에서 ID 형식으로 전달된 서브넷을 찾지 못한 오류를 보완한 것입니다.
+- 부하분산 요청 로그는 `http_load_balancer`, 그 로그를 기반으로 만든 모니터링 지표는 `l7_lb_rule`을 사용합니다. [Google의 자원 매핑 설명](https://docs.cloud.google.com/load-balancing/docs/https/https-logs-monitor-overview)을 따릅니다.
+- `ghost-project.local.tfvars`는 외부 입력이 남은 코어 테스트 단계이며 전체 배포 입력 예시와 구분합니다. 도메인·알림 수신자·Tailscale 키/경로·앱 비밀값이 준비되면 남은 연결을 완료합니다.

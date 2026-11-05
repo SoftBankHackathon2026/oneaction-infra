@@ -1,0 +1,1122 @@
+{
+  "project_id": "ghost-project-513812",
+  "region": "asia-northeast3",
+  "observed_at_utc": "2026-11-05T15:55:19.945489+00:00",
+  "read_only": true,
+  "project": {
+    "status": "OBSERVED",
+    "data": {
+      "lifecycleState": "ACTIVE",
+      "projectId": "ghost-project-513812",
+      "projectNumber": "251118972904"
+    }
+  },
+  "billing": {
+    "status": "OBSERVED",
+    "data": {
+      "billingEnabled": true,
+      "projectId": "ghost-project-513812"
+    }
+  },
+  "enabled_services": {
+    "status": "OBSERVED",
+    "data": [
+      {
+        "config": {
+          "name": "analyticshub.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "apptopology.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "artifactregistry.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "autoscaling.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "backupdr.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "bigquery.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "bigqueryconnection.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "bigquerydatapolicy.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "bigquerydatatransfer.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "bigquerymigration.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "bigqueryreservation.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "bigquerystorage.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "cloudapis.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "cloudresourcemanager.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "cloudtrace.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "compute.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "container.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "containerfilesystem.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "containerregistry.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "dataform.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "dataplex.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "datastore.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "dns.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "file.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "gkebackup.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "iam.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "iamcredentials.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "logging.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "managedkafka.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "monitoring.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "networkconnectivity.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "oslogin.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "pubsub.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "secretmanager.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "servicemanagement.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "servicenetworking.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "serviceusage.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "sql-component.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "sqladmin.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "storage-api.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "storage-component.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "storage.googleapis.com"
+        }
+      },
+      {
+        "config": {
+          "name": "telemetry.googleapis.com"
+        }
+      }
+    ]
+  },
+  "inventory": {
+    "networks": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "autoCreateSubnetworks": true,
+          "id": "534061791664221758",
+          "name": "default",
+          "routingConfig": {
+            "bgpBestPathSelectionMode": "LEGACY",
+            "routingMode": "REGIONAL"
+          }
+        },
+        {
+          "autoCreateSubnetworks": false,
+          "id": "3756510010788621485",
+          "name": "oneaction-dev-vpc",
+          "routingConfig": {
+            "bgpBestPathSelectionMode": "LEGACY",
+            "routingMode": "REGIONAL"
+          }
+        }
+      ]
+    },
+    "subnets": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "ipCidrRange": "10.128.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-central1"
+        },
+        {
+          "ipCidrRange": "10.132.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west1"
+        },
+        {
+          "ipCidrRange": "10.138.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-west1"
+        },
+        {
+          "ipCidrRange": "10.140.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-east1"
+        },
+        {
+          "ipCidrRange": "10.142.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-east1"
+        },
+        {
+          "ipCidrRange": "10.146.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast1"
+        },
+        {
+          "ipCidrRange": "10.148.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-southeast1"
+        },
+        {
+          "ipCidrRange": "10.150.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-east4"
+        },
+        {
+          "ipCidrRange": "10.152.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/australia-southeast1"
+        },
+        {
+          "ipCidrRange": "10.154.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west2"
+        },
+        {
+          "ipCidrRange": "10.156.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west3"
+        },
+        {
+          "ipCidrRange": "10.158.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/southamerica-east1"
+        },
+        {
+          "ipCidrRange": "10.160.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-south1"
+        },
+        {
+          "ipCidrRange": "10.162.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/northamerica-northeast1"
+        },
+        {
+          "ipCidrRange": "10.164.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west4"
+        },
+        {
+          "ipCidrRange": "10.166.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-north1"
+        },
+        {
+          "ipCidrRange": "10.168.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-west2"
+        },
+        {
+          "ipCidrRange": "10.170.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-east2"
+        },
+        {
+          "ipCidrRange": "10.172.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west6"
+        },
+        {
+          "ipCidrRange": "10.174.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast2"
+        },
+        {
+          "ipCidrRange": "10.178.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3"
+        },
+        {
+          "ipCidrRange": "172.20.0.0/28",
+          "name": "gke-oneaction-dev-c727bb13-pe-subnet",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3"
+        },
+        {
+          "ipCidrRange": "10.20.10.0/24",
+          "name": "oneaction-dev-data",
+          "privateIpGoogleAccess": true,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3"
+        },
+        {
+          "ipCidrRange": "10.20.32.0/19",
+          "name": "oneaction-dev-gke",
+          "privateIpGoogleAccess": true,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3",
+          "secondaryIpRanges": [
+            {
+              "ipCidrRange": "10.24.0.0/14",
+              "rangeName": "pods"
+            },
+            {
+              "ipCidrRange": "10.28.0.0/20",
+              "rangeName": "services"
+            }
+          ]
+        },
+        {
+          "ipCidrRange": "10.180.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-west3"
+        },
+        {
+          "ipCidrRange": "10.182.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-west4"
+        },
+        {
+          "ipCidrRange": "10.184.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-southeast2"
+        },
+        {
+          "ipCidrRange": "10.186.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-central2"
+        },
+        {
+          "ipCidrRange": "10.188.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/northamerica-northeast2"
+        },
+        {
+          "ipCidrRange": "10.190.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-south2"
+        },
+        {
+          "ipCidrRange": "10.192.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/australia-southeast2"
+        },
+        {
+          "ipCidrRange": "10.194.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/southamerica-west1"
+        },
+        {
+          "ipCidrRange": "10.198.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west8"
+        },
+        {
+          "ipCidrRange": "10.200.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west9"
+        },
+        {
+          "ipCidrRange": "10.202.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-east5"
+        },
+        {
+          "ipCidrRange": "10.204.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-southwest1"
+        },
+        {
+          "ipCidrRange": "10.206.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/us-south1"
+        },
+        {
+          "ipCidrRange": "10.208.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/me-west1"
+        },
+        {
+          "ipCidrRange": "10.210.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west12"
+        },
+        {
+          "ipCidrRange": "10.212.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/me-central1"
+        },
+        {
+          "ipCidrRange": "10.214.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-west10"
+        },
+        {
+          "ipCidrRange": "10.218.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/africa-south1"
+        },
+        {
+          "ipCidrRange": "10.224.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/northamerica-south1"
+        },
+        {
+          "ipCidrRange": "10.226.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/europe-north2"
+        },
+        {
+          "ipCidrRange": "10.232.0.0/20",
+          "name": "default",
+          "privateIpGoogleAccess": false,
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-southeast3"
+        }
+      ]
+    },
+    "firewalls": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "allowed": [
+            {
+              "IPProtocol": "icmp"
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": false
+          },
+          "name": "default-allow-icmp",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/default",
+          "priority": 65534,
+          "sourceRanges": [
+            "0.0.0.0/0"
+          ]
+        },
+        {
+          "allowed": [
+            {
+              "IPProtocol": "tcp",
+              "ports": [
+                "0-65535"
+              ]
+            },
+            {
+              "IPProtocol": "udp",
+              "ports": [
+                "0-65535"
+              ]
+            },
+            {
+              "IPProtocol": "icmp"
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": false
+          },
+          "name": "default-allow-internal",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/default",
+          "priority": 65534,
+          "sourceRanges": [
+            "10.128.0.0/9"
+          ]
+        },
+        {
+          "allowed": [
+            {
+              "IPProtocol": "tcp",
+              "ports": [
+                "3389"
+              ]
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": false
+          },
+          "name": "default-allow-rdp",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/default",
+          "priority": 65534,
+          "sourceRanges": [
+            "0.0.0.0/0"
+          ]
+        },
+        {
+          "allowed": [
+            {
+              "IPProtocol": "tcp",
+              "ports": [
+                "22"
+              ]
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": false
+          },
+          "name": "default-allow-ssh",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/default",
+          "priority": 65534,
+          "sourceRanges": [
+            "0.0.0.0/0"
+          ]
+        },
+        {
+          "allowed": [
+            {
+              "IPProtocol": "tcp"
+            },
+            {
+              "IPProtocol": "udp"
+            },
+            {
+              "IPProtocol": "icmp"
+            },
+            {
+              "IPProtocol": "esp"
+            },
+            {
+              "IPProtocol": "ah"
+            },
+            {
+              "IPProtocol": "sctp"
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": false
+          },
+          "name": "gke-oneaction-dev-e692ffbf-all",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/oneaction-dev-vpc",
+          "priority": 1000,
+          "sourceRanges": [
+            "10.24.0.0/14"
+          ],
+          "targetTags": [
+            "gke-oneaction-dev-e692ffbf-node"
+          ]
+        },
+        {
+          "allowed": [
+            {
+              "IPProtocol": "tcp",
+              "ports": [
+                "1-65535"
+              ]
+            },
+            {
+              "IPProtocol": "udp",
+              "ports": [
+                "1-65535"
+              ]
+            },
+            {
+              "IPProtocol": "icmp"
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": false
+          },
+          "name": "gke-oneaction-dev-e692ffbf-vms",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/oneaction-dev-vpc",
+          "priority": 1000,
+          "sourceRanges": [
+            "10.20.32.0/19"
+          ],
+          "targetTags": [
+            "gke-oneaction-dev-e692ffbf-node"
+          ]
+        },
+        {
+          "allowed": [
+            {
+              "IPProtocol": "tcp",
+              "ports": [
+                "8080"
+              ]
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": false
+          },
+          "name": "k8s-fw-l7--a7a066a350a92405",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/oneaction-dev-vpc",
+          "priority": 1000,
+          "sourceRanges": [
+            "130.211.0.0/22",
+            "35.191.0.0/16"
+          ],
+          "targetTags": [
+            "gke-oneaction-dev-e692ffbf-node"
+          ]
+        },
+        {
+          "denied": [
+            {
+              "IPProtocol": "all"
+            }
+          ],
+          "direction": "INGRESS",
+          "disabled": false,
+          "logConfig": {
+            "enable": true,
+            "metadata": "INCLUDE_ALL_METADATA"
+          },
+          "name": "oneaction-dev-deny-unmatched-ingress",
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/oneaction-dev-vpc",
+          "priority": 65534,
+          "sourceRanges": [
+            "0.0.0.0/0"
+          ]
+        }
+      ]
+    },
+    "routers": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "name": "oneaction-dev-router",
+          "nats": [
+            {
+              "autoNetworkTier": "PREMIUM",
+              "effectiveTcpTimeWaitTimeoutSec": 120,
+              "enableEndpointIndependentMapping": false,
+              "endpointTypes": [
+                "ENDPOINT_TYPE_VM"
+              ],
+              "icmpIdleTimeoutSec": 30,
+              "logConfig": {
+                "enable": true,
+                "filter": "ERRORS_ONLY"
+              },
+              "name": "oneaction-dev-nat",
+              "natIpAllocateOption": "AUTO_ONLY",
+              "sourceSubnetworkIpRangesToNat": "LIST_OF_SUBNETWORKS",
+              "subnetworks": [
+                {
+                  "name": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3/subnetworks/oneaction-dev-gke",
+                  "sourceIpRangesToNat": [
+                    "ALL_IP_RANGES"
+                  ]
+                }
+              ],
+              "tcpEstablishedIdleTimeoutSec": 1200,
+              "tcpTimeWaitTimeoutSec": 120,
+              "tcpTransitoryIdleTimeoutSec": 30,
+              "type": "PUBLIC",
+              "udpIdleTimeoutSec": 30
+            }
+          ],
+          "network": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/global/networks/oneaction-dev-vpc",
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3"
+        }
+      ]
+    },
+    "instances": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "id": "4168893219859407706",
+          "machineType": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-a/machineTypes/e2-custom-2-4096",
+          "name": "gke-oneaction-dev-oneaction-dev-gener-adcf179e-w6r2",
+          "status": "RUNNING",
+          "zone": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-a"
+        },
+        {
+          "id": "7879350741440209755",
+          "machineType": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-c/machineTypes/e2-custom-2-4096",
+          "name": "gke-oneaction-dev-oneaction-dev-gener-47434f66-xllk",
+          "status": "RUNNING",
+          "zone": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-c"
+        },
+        {
+          "id": "7333237094178956120",
+          "machineType": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-b/machineTypes/e2-custom-2-4096",
+          "name": "gke-oneaction-dev-oneaction-dev-gener-232bdfd8-dkj8",
+          "status": "RUNNING",
+          "zone": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-b"
+        }
+      ]
+    },
+    "addresses": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "address": "34.149.47.248",
+          "addressType": "EXTERNAL",
+          "name": "oneaction-dev-platform",
+          "status": "IN_USE"
+        },
+        {
+          "address": "10.20.128.0",
+          "addressType": "INTERNAL",
+          "name": "oneaction-dev-private-services",
+          "purpose": "VPC_PEERING",
+          "status": "RESERVED"
+        },
+        {
+          "address": "10.20.10.5",
+          "addressType": "INTERNAL",
+          "name": "gmk-caba55dcbfbc49e6b4fba02a441faac2-9337f571-bootstrap",
+          "purpose": "GCE_ENDPOINT",
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3",
+          "status": "IN_USE"
+        },
+        {
+          "address": "10.20.10.2",
+          "addressType": "INTERNAL",
+          "name": "gmk-caba55dcbfbc49e6b4fba02a441faac2-9337f571-broker-0",
+          "purpose": "GCE_ENDPOINT",
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3",
+          "status": "IN_USE"
+        },
+        {
+          "address": "10.20.10.3",
+          "addressType": "INTERNAL",
+          "name": "gmk-caba55dcbfbc49e6b4fba02a441faac2-9337f571-broker-1",
+          "purpose": "GCE_ENDPOINT",
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3",
+          "status": "IN_USE"
+        },
+        {
+          "address": "10.20.10.4",
+          "addressType": "INTERNAL",
+          "name": "gmk-caba55dcbfbc49e6b4fba02a441faac2-9337f571-broker-2",
+          "purpose": "GCE_ENDPOINT",
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3",
+          "status": "IN_USE"
+        },
+        {
+          "address": "34.64.255.164",
+          "addressType": "EXTERNAL",
+          "name": "nat-auto-ip-38039730-3-1793891769055439",
+          "purpose": "NAT_AUTO",
+          "region": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/regions/asia-northeast3",
+          "status": "IN_USE"
+        }
+      ]
+    },
+    "disks": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "name": "gke-oneaction-dev-oneaction-dev-gener-adcf179e-w6r2",
+          "sizeGb": "20",
+          "status": "READY",
+          "type": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-a/diskTypes/pd-balanced",
+          "users": [
+            "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-a/instances/gke-oneaction-dev-oneaction-dev-gener-adcf179e-w6r2"
+          ],
+          "zone": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-a"
+        },
+        {
+          "name": "gke-oneaction-dev-oneaction-dev-gener-47434f66-xllk",
+          "sizeGb": "20",
+          "status": "READY",
+          "type": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-c/diskTypes/pd-balanced",
+          "users": [
+            "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-c/instances/gke-oneaction-dev-oneaction-dev-gener-47434f66-xllk"
+          ],
+          "zone": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-c"
+        },
+        {
+          "name": "gke-oneaction-dev-oneaction-dev-gener-232bdfd8-dkj8",
+          "sizeGb": "20",
+          "status": "READY",
+          "type": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-b/diskTypes/pd-balanced",
+          "users": [
+            "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-b/instances/gke-oneaction-dev-oneaction-dev-gener-232bdfd8-dkj8"
+          ],
+          "zone": "https://www.googleapis.com/compute/v1/projects/ghost-project-513812/zones/asia-northeast3-b"
+        }
+      ]
+    },
+    "clusters": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "currentMasterVersion": "1.36.4-gke.2046003",
+          "location": "asia-northeast3",
+          "locations": [
+            "asia-northeast3-a",
+            "asia-northeast3-b",
+            "asia-northeast3-c"
+          ],
+          "name": "oneaction-dev",
+          "status": "RUNNING"
+        }
+      ]
+    },
+    "sql": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "databaseVersion": "POSTGRES_16",
+          "name": "oneaction-dev-review",
+          "region": "asia-northeast3",
+          "settings": {
+            "dataDiskSizeGb": "20",
+            "databaseFlags": [
+              {
+                "name": "log_min_duration_statement",
+                "value": "1000"
+              },
+              {
+                "name": "cloudsql.logical_decoding",
+                "value": "on"
+              }
+            ],
+            "tier": "db-custom-1-3840",
+            "userLabels": {
+              "env": "dev",
+              "managed_by": "terraform",
+              "owner": "platform",
+              "project": "oneaction"
+            }
+          },
+          "state": "RUNNABLE"
+        }
+      ]
+    },
+    "buckets": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "location": "ASIA-NORTHEAST3",
+          "name": "ghost-project-513812-oneaction-dev-logs"
+        },
+        {
+          "location": "ASIA-NORTHEAST3",
+          "name": "ghost-project-513812-oneaction-dev-review"
+        },
+        {
+          "location": "ASIA-NORTHEAST3",
+          "name": "ghost-project-513812-tfstate"
+        }
+      ]
+    },
+    "dns": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "cloudLoggingConfig": {
+            "kind": "dns#managedZoneCloudLoggingConfig"
+          },
+          "dnsName": "5b970886.asia-northeast3.managedkafka.s.cloud.goog.",
+          "name": "gmk-as-ne3-5b970886-acbc7fc6de7b",
+          "nameServers": [
+            "ns-gcp-private.googledomains.com."
+          ],
+          "visibility": "private"
+        }
+      ]
+    },
+    "secrets_metadata": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "createTime": "2026-11-05T15:06:22.484255Z",
+          "name": "projects/251118972904/secrets/oneaction-dev-a740-gitops-token",
+          "replication": {
+            "automatic": {}
+          }
+        },
+        {
+          "createTime": "2026-11-05T15:06:22.486018Z",
+          "name": "projects/251118972904/secrets/oneaction-dev-a740-review-db",
+          "replication": {
+            "automatic": {}
+          }
+        },
+        {
+          "createTime": "2026-11-05T15:06:22.484506Z",
+          "name": "projects/251118972904/secrets/oneaction-dev-a740-review-service",
+          "replication": {
+            "automatic": {}
+          }
+        }
+      ]
+    },
+    "service_accounts": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "disabled": false,
+          "email": "oneaction-dev-a740-review@ghost-project-513812.iam.gserviceaccount.com",
+          "name": "projects/ghost-project-513812/serviceAccounts/oneaction-dev-a740-review@ghost-project-513812.iam.gserviceaccount.com"
+        },
+        {
+          "disabled": false,
+          "email": "oneaction-dev-nodes@ghost-project-513812.iam.gserviceaccount.com",
+          "name": "projects/ghost-project-513812/serviceAccounts/oneaction-dev-nodes@ghost-project-513812.iam.gserviceaccount.com"
+        },
+        {
+          "disabled": false,
+          "email": "oneaction-dev-a740-argocd-eso@ghost-project-513812.iam.gserviceaccount.com",
+          "name": "projects/ghost-project-513812/serviceAccounts/oneaction-dev-a740-argocd-eso@ghost-project-513812.iam.gserviceaccount.com"
+        },
+        {
+          "disabled": false,
+          "email": "251118972904-compute@developer.gserviceaccount.com",
+          "name": "projects/ghost-project-513812/serviceAccounts/251118972904-compute@developer.gserviceaccount.com"
+        },
+        {
+          "disabled": false,
+          "email": "oneaction-dev-a740-eso@ghost-project-513812.iam.gserviceaccount.com",
+          "name": "projects/ghost-project-513812/serviceAccounts/oneaction-dev-a740-eso@ghost-project-513812.iam.gserviceaccount.com"
+        }
+      ]
+    },
+    "log_sinks": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "destination": "storage.googleapis.com/ghost-project-513812-oneaction-dev-logs",
+          "filter": "(resource.type=\"k8s_container\" AND resource.labels.cluster_name=\"oneaction-dev\") OR\n(resource.type=\"k8s_cluster\" AND resource.labels.cluster_name=\"oneaction-dev\") OR\n(resource.type=\"cloudsql_database\" AND resource.labels.database_id=\"ghost-project-513812:oneaction-dev-review\") OR\n(resource.type=\"nat_gateway\" AND resource.labels.gateway_name=\"oneaction-dev-nat\") OR\n(resource.type=\"http_load_balancer\" AND resource.labels.url_map_name:\"-platform-oneaction-dev-platform-\") OR\n(resource.type=\"gce_subnetwork\" AND (resource.labels.subnetwork_name=\"oneaction-dev-gke\" OR resource.labels.subnetwork_name=\"oneaction-dev-data\"))",
+          "name": "oneaction-dev-platform"
+        },
+        {
+          "destination": "logging.googleapis.com/projects/ghost-project-513812/locations/global/buckets/_Required",
+          "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+          "name": "_Required"
+        },
+        {
+          "destination": "logging.googleapis.com/projects/ghost-project-513812/locations/global/buckets/_Default",
+          "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")",
+          "name": "_Default"
+        }
+      ]
+    },
+    "alert_policies": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "displayName": "oneaction-dev-sql_cpu",
+          "enabled": true,
+          "name": "projects/ghost-project-513812/alertPolicies/10681035327165020199"
+        },
+        {
+          "displayName": "oneaction-dev-sql-free-storage",
+          "enabled": true,
+          "name": "projects/ghost-project-513812/alertPolicies/17688208915064109951"
+        },
+        {
+          "displayName": "oneaction-dev-lb-5xx",
+          "enabled": true,
+          "name": "projects/ghost-project-513812/alertPolicies/4675929886959122904"
+        },
+        {
+          "displayName": "oneaction-dev-nat_drops",
+          "enabled": true,
+          "name": "projects/ghost-project-513812/alertPolicies/7149721792624036140"
+        }
+      ]
+    },
+    "kafka": {
+      "status": "OBSERVED",
+      "data": [
+        {
+          "capacityConfig": {
+            "memoryBytes": "4294967296",
+            "vcpuCount": "4"
+          },
+          "gcpConfig": {
+            "accessConfig": {
+              "networkConfigs": [
+                {
+                  "subnet": "projects/251118972904/regions/asia-northeast3/subnetworks/oneaction-dev-data"
+                }
+              ]
+            }
+          },
+          "name": "projects/ghost-project-513812/locations/asia-northeast3/clusters/oneaction-dev-review",
+          "state": "ACTIVE"
+        }
+      ]
+    }
+  }
+}

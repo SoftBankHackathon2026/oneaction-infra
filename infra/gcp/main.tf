@@ -96,16 +96,17 @@ module "dns" {
 }
 
 module "kafka" {
-  source     = "./kafka"
-  project_id = var.project_id
-  region     = var.region
-  name       = local.name
-  labels     = local.labels
-  enabled    = var.enable_kafka
-  subnet_id  = module.network.data_subnet_id
-  vcpu_count = var.kafka_vcpu_count
-  memory_gib = var.kafka_memory_gib
-  depends_on = [google_project_service.required]
+  source            = "./kafka"
+  project_id        = var.project_id
+  region            = var.region
+  name              = local.name
+  labels            = local.labels
+  enabled           = var.enable_kafka
+  subnet_id         = module.network.data_subnet_id
+  vcpu_count        = var.kafka_vcpu_count
+  memory_gib        = var.kafka_memory_gib
+  bootstrap_brokers = var.kafka_bootstrap_brokers
+  depends_on        = [google_project_service.required]
 }
 
 module "secrets" {

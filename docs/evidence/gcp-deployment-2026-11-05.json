@@ -1,0 +1,76 @@
+{
+  "checked_at_utc": "2026-11-05 10:42:34 UTC",
+  "project_id": "softbank-ghost",
+  "project_number": "499945065361",
+  "observations": {
+    "gcp_project": {
+      "status": "VERIFIED",
+      "source": "https://console.cloud.google.com/welcome?authuser=1&project=softbank-ghost"
+    },
+    "gcp_billing": {
+      "status": "NOT_LINKED",
+      "source": "https://console.cloud.google.com/billing/linkedaccount?authuser=1&project=softbank-ghost",
+      "evidence_text": "이 프로젝트에 결제 계정이 연결되어 있지 않습니다."
+    },
+    "gke_api": {
+      "status": "NOT_ENABLED",
+      "source": "https://console.cloud.google.com/marketplace/product/google/container.googleapis.com?authuser=1&project=softbank-ghost"
+    },
+    "gcp_resource_inventory": {
+      "status": "UNVERIFIED",
+      "resources": null
+    },
+    "aws_identity": {
+      "status": "VERIFIED",
+      "account_id": "974402993422",
+      "role": "GhostInfraEngineer"
+    },
+    "aws_resource_inventory": {
+      "status": "UNVERIFIED",
+      "reason": "RESOURCE_CONSOLE_REQUIRES_LOGIN",
+      "resources": null
+    }
+  },
+  "code": {
+    "repository": "SoftBankHackathon2026/oneaction-infra",
+    "pr_number": 3,
+    "draft": true,
+    "head_sha": "19a16116a4fde48bae5ced15820df67acc893d67",
+    "aws_baseline": "0c94c0141588934dee0e306b3f7ebb355f2a33d8",
+    "aws_source_files_unchanged": true,
+    "title": "infra: AWS 전체 구성에 대응하는 GCP 배포 기반과 사전 점검 추가",
+    "pr_state": "OPEN",
+    "metadata_update": {
+      "status": "VERIFIED",
+      "explicit_user_approval": true,
+      "verification": "gh pr view: title/body match, isDraft true, state OPEN, head unchanged",
+      "verified_at_utc": "2026-11-05T10:51:12.234078+00:00"
+    }
+  },
+  "checks": {
+    "terraform_mock": {
+      "passed": 17,
+      "failed": 0,
+      "cloud_api_calls": false
+    },
+    "python": {
+      "passed": 16,
+      "failed": 0
+    },
+    "remote_ci": {
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/SoftBankHackathon2026/oneaction-infra/actions/runs/42012584196",
+      "head_sha": "19a16116a4fde48bae5ced15820df67acc893d67"
+    }
+  },
+  "deployment": {
+    "real_plan_executed": false,
+    "apply_executed": false
+  },
+  "pending": {
+    "billing": "USER_WILL_NOTIFY_AFTER_LINKING",
+    "slack": "NOT_POSTED_ADDITIONAL_AUTH_STOPPED_BY_USER",
+    "pr_metadata": "RESOLVED_CLI_UPDATE_EXPLICITLY_APPROVED_AND_VERIFIED"
+  }
+}
