@@ -9,3 +9,8 @@ output "private_ip" {
 output "advertised_routes" {
   value = var.advertise_routes
 }
+
+output "tailnet_routes" {
+  description = "VPC private route table entries that point at the router ENI."
+  value       = var.tailnet_routes
+}
