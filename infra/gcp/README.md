@@ -1,6 +1,6 @@
 # oneaction GCP 대응 인프라
 
-> `softbank-ghost` 전체 범위 배포 준비와 실제 미완료 항목은 [배포 준비 기록](../../docs/gcp-deployment-2026-11-05.md)에 정리했습니다. 입력 예시는 `softbank-ghost.tfvars.example`이며, 결제·도메인·비밀 참조와 실제 계획 검토가 끝나기 전 적용하지 않습니다.
+> 현재 대상은 `ghost-project-513812`(표시명 `ghost-project`)입니다. [현재 배포 기록](../../docs/ghost-project-deployment-2026-11-05.md)과 `ghost-project.tfvars.example`을 사용합니다. 이전 `softbank-ghost` [준비 기록](../../docs/gcp-deployment-2026-11-05.md)은 과거 관찰로 보존합니다. 실행 인증·실제 입력·생성 계획 검토가 끝나기 전 적용하지 않습니다.
 
 > 작업 계획: [[docs/gsd-worklog/M001/S001/T001/T001-PLAN|Terraform 구현]] · [[docs/gsd-worklog/M001/S001/T002/T002-PLAN|배포 연결·문서]]
 
