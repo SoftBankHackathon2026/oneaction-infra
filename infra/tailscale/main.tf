@@ -74,6 +74,13 @@ resource "aws_iam_role_policy" "read_auth_key" {
   policy = data.aws_iam_policy_document.read_auth_key.json
 }
 
+# SSM Run Command 로 라우터 설정을 바꿀 수 있게 한다 (SSH·수신 포트 없이). 실행 중인 라우터를 새로 만들지 않고
+# tailscale 설정을 바꿀 때 쓴다. 권한 경계(GhostWorkloadBoundary)는 그대로 적용된다.
+resource "aws_iam_role_policy_attachment" "router_ssm" {
+  role       = aws_iam_role.router.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_instance_profile" "router" {
   name = "ghost-oneaction-tailscale-router"
   role = aws_iam_role.router.name
@@ -157,13 +164,12 @@ resource "aws_instance" "router" {
 
   tags = { Name = "oneaction-tailscale-router" }
 
-  # user_data 는 첫 부팅에만 실행되므로, 바꾸면 인스턴스를 새로 만든다. 새 라우터가 먼저 떠서 같은 경로를
-  # 광고한 뒤 옛 라우터를 지우므로(create_before_destroy) 홈랩 → RDS·MSK 경로가 거의 끊기지 않는다.
-  # 옛 장치는 tailnet 에 오프라인으로 남으니 Tailscale 관리 콘솔에서 지운다.
-  user_data_replace_on_change = true
-
+  # user_data 는 첫 부팅에만 실행된다. 실행 중인 라우터에 바뀐 설정을 넣으려고 인스턴스를 새로 만들면 홈랩 → RDS·MSK
+  # (CDC) 경로가 흔들리고, 계정 vCPU 한도(8)에 걸려 새 라우터를 먼저 띄울 수도 없다(2026-11-05 확인).
+  # 그래서 user_data 변경으로는 교체하지 않고, 실행 중인 라우터는 SSM 으로 같은 설정을 맞춘다 (README "설정 바꾸기").
+  # 라우터를 새로 만들 때는 이 user_data 가 그대로 쓰인다.
   lifecycle {
-    ignore_changes        = [ami] # pinned at first apply; replace deliberately
+    ignore_changes        = [ami, user_data] # pinned at first apply; replace deliberately
     create_before_destroy = true
   }
 }
