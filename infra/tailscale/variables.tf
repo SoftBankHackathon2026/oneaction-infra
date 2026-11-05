@@ -43,3 +43,18 @@ variable "advertise_routes" {
   type        = list(string)
   default     = ["10.0.0.0/16"]
 }
+
+variable "tailnet_routes" {
+  description = <<-EOT
+    VPC 에서 라우터를 거쳐 tailnet 으로 보낼 대역. EKS 의 플랫폼 수집기가 온프렘 kube API(172.30.1.10:6443)와
+    워커·Connect NodePort 에 닿는 데 쓴다. GCP 라우터가 붙으면 10.20.32.0/19 등 GCP 대역을 더한다.
+    빈 목록이면 기존처럼 tailnet → VPC 한 방향만 연다.
+  EOT
+  type        = list(string)
+  default     = ["172.30.1.0/24"]
+
+  validation {
+    condition     = alltrue([for cidr in var.tailnet_routes : can(cidrnetmask(cidr)) && !startswith(cidr, "10.0.")])
+    error_message = "Use IPv4 CIDRs outside the oneaction VPC (10.0.0.0/16)."
+  }
+}
