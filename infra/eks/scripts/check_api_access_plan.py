@@ -18,14 +18,14 @@ def validate(plan, expected_cidrs):
         require(network.version == 4 and network.prefixlen == 32, 'Use individual IPv4 /32 entries.')
     require(plan['terraform_version'] == '1.5.7', 'Use reviewed Terraform 1.5.7.')
     provider = plan['configuration']['provider_config']['aws']['expressions']
-    require(provider['allowed_account_ids']['constant_value'] == ['123456789012'], 'Unexpected AWS account guard.')
+    require(provider['allowed_account_ids']['constant_value'] == ['974402993422'], 'Unexpected AWS account guard.')
     require(plan['variables']['aws_region']['value'] == 'ap-northeast-2', 'Unexpected workload region.')
     changed = [r for r in plan['resource_changes'] if r['mode'] == 'managed' and r['change']['actions'] != ['no-op']]
     require(len(changed) == 1 and changed[0]['address'] == 'aws_eks_cluster.this', 'Only the EKS cluster may change.')
     change = changed[0]['change']
     require(change['actions'] == ['update'], 'Creation, deletion or replacement is not allowed.')
     before, after = change['before'], change['after']
-    require(before['arn'] == 'arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction', 'Unexpected cluster ARN.')
+    require(before['arn'] == 'arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction', 'Unexpected cluster ARN.')
     require(len(before['vpc_config']) == len(after['vpc_config']) == 1, 'Unexpected VPC configuration.')
     prior = set(before['vpc_config'][0]['public_access_cidrs'])
     target = set(after['vpc_config'][0]['public_access_cidrs'])

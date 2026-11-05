@@ -1,7 +1,7 @@
 provider "aws" {
   profile             = var.aws_profile == "" ? null : var.aws_profile
   region              = var.aws_region
-  allowed_account_ids = ["123456789012"]
+  allowed_account_ids = ["974402993422"]
 
   default_tags {
     tags = {
@@ -15,7 +15,7 @@ provider "aws" {
 locals {
   cluster_name = "oneaction-review"
   remote_state_config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
     encrypt        = true

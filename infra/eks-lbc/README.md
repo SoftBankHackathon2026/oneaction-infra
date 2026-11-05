@@ -8,15 +8,15 @@
 
 | 항목 | 값 |
 | --- | --- |
-| 계정 / 리전 | `123456789012` / `ap-northeast-2` |
+| 계정 / 리전 | `974402993422` / `ap-northeast-2` |
 | 클러스터 / VPC | EKS·network 원격 상태에서 조회 |
 | IAM 상태 키 | `dev/eks-lbc/terraform.tfstate` |
 | Controller / Helm chart | `v3.6.0` / `3.6.0` |
 | 검증 도구 | Terraform 1.5.7, AWS provider 5.100.0, AWS CLI v2, Helm 3.22.0, kubectl 1.36, Python 3 + PyYAML 6.0.3 |
 | ServiceAccount | `kube-system/aws-load-balancer-controller` |
-| IAM 역할 | `oneaction-aws-load-balancer-controller` |
+| IAM 역할 | `ghost-oneaction-aws-load-balancer-controller` |
 | 복제본 / Pod 자원 | 2개, 각각 요청 50m CPU·128Mi 메모리 / 제한 250m·256Mi |
-| AWS 연결 | 전용 IRSA, 지역 STS endpoint 사용 |
+| AWS 연결 | EKS Pod Identity (전용 역할, `ghost-` 이름과 권한 경계 `GhostWorkloadBoundary`) |
 | 활성 경로 | ALB Ingress, TargetGroupBinding |
 | 비활성 기능 | Gateway API, WAF, Shield, Service mutator webhook |
 
@@ -28,7 +28,7 @@
 
 `iam-policy-v3.6.0.json`은 [Controller v3.6.0 공식 정책](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v3.6.0/docs/install/iam_policy.json) 원본입니다. `artifacts.json`에 정책과 공식 Helm chart의 버전·SHA256을 고정하고 설치 전에 확인합니다. `.gitattributes`로 이 파일의 자동 줄바꿈 변환을 막아 Windows checkout에서도 원본 해시를 유지합니다. 설치 시 Git 저장소의 values와 Terraform outputs만 사용합니다.
 
-IRSA trust는 기존 EKS OIDC provider, `aud=sts.amazonaws.com`, 정확한 ServiceAccount `sub`로 제한합니다. 정책은 공식 릴리스의 액션을 기반으로 다음 경계를 추가합니다.
+팀 계정은 OIDC 공급자를 만들 수 없어 IRSA 대신 EKS Pod Identity를 씁니다. 역할 trust는 `pods.eks.amazonaws.com`의 `sts:AssumeRole`·`sts:TagSession`이고, 세션 태그로 `kube-system/aws-load-balancer-controller`만 허용합니다. ServiceAccount에 `eks.amazonaws.com/role-arn` 어노테이션을 달지 않습니다. 정책은 공식 릴리스의 액션을 기반으로 다음 경계를 추가합니다.
 
 - EC2/ELB API 호출은 서울 리전으로 제한합니다.
 - 지원되는 리소스 ARN은 팀 계정과 서울 리전으로 제한합니다.

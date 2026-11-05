@@ -13,7 +13,7 @@ from check_plan import check
 def main(path):
     base = json.loads(Path(path).read_text(encoding='utf-8-sig'))
     check(base)
-    arn = 'arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:guard-fixture-gitops-Ab1234'
+    arn = 'arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:guard-fixture-gitops-Ab1234'
     address = 'aws_iam_role_policy.read_gitops[0]'
     enabled = copy.deepcopy(base)
     enabled['variables']['gitops_token_secret_arn'] = {'value': arn}
@@ -29,7 +29,7 @@ def main(path):
     enabled['resource_changes'].append({
         'address': address, 'mode': 'managed', 'type': 'aws_iam_role_policy',
         'change': {'actions': ['create'], 'before': None, 'after': {
-            'role': 'oneaction-external-secrets', 'name': 'read-gitops-token-secret',
+            'role': 'ghost-oneaction-external-secrets', 'name': 'read-gitops-token-secret',
             'policy': json.dumps(policy),
         }},
     })
@@ -55,7 +55,7 @@ def main(path):
         'multiple Secrets': lambda p: change_policy(p, 'Resource', [arn, arn + 'other']),
         'missing region boundary': lambda p: change_policy(p, 'Condition', {}),
         'wrong role': lambda p: change_resource(p, address, 'role', 'other-role'),
-        'unexpected KMS key': lambda p: next(r for r in p['prior_state']['values']['root_module']['resources'] if r['address'] == 'data.aws_secretsmanager_secret.gitops[0]')['values'].update(kms_key_id='arn:aws:kms:ap-northeast-2:123456789012:key/unreviewed'),
+        'unexpected KMS key': lambda p: next(r for r in p['prior_state']['values']['root_module']['resources'] if r['address'] == 'data.aws_secretsmanager_secret.gitops[0]')['values'].update(kms_key_id='arn:aws:kms:ap-northeast-2:974402993422:key/unreviewed'),
         'mismatched Secret metadata': lambda p: next(r for r in p['prior_state']['values']['root_module']['resources'] if r['address'] == 'data.aws_secretsmanager_secret.gitops[0]')['values'].update(arn=arn + 'other'),
         'existing role recreation': lambda p: next(r for r in p['resource_changes'] if r['address'] == 'aws_iam_role.eso')['change'].update(actions=['create']),
         'existing output change': lambda p: p['output_changes']['target_namespace'].update(actions=['update']),
@@ -70,7 +70,7 @@ def main(path):
         else:
             raise AssertionError(f'Unsafe plan accepted: {name}')
 
-    for expected in [None, arn.replace('123456789012', '111122223333'), arn.replace('ap-northeast-2', 'us-east-1'), arn + '*']:
+    for expected in [None, arn.replace('974402993422', '111122223333'), arn.replace('ap-northeast-2', 'us-east-1'), arn + '*']:
         bad = copy.deepcopy(enabled)
         bad['variables']['gitops_token_secret_arn']['value'] = expected
         try:

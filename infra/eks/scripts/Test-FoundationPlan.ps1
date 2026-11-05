@@ -32,15 +32,14 @@ $oneactionAllowedAddresses = @(
     'aws_eks_cluster.this',
     'aws_eks_node_group.this',
     'aws_launch_template.node',
-    'aws_iam_openid_connect_provider.cluster',
-    'aws_iam_role.cluster', 'aws_iam_role.node', 'aws_iam_role.cni',
-    'aws_iam_role_policy_attachment.cluster', 'aws_iam_role_policy_attachment.node', 'aws_iam_role_policy_attachment.cni',
+    'aws_iam_role.cluster', 'aws_iam_role.node',
+    'aws_iam_role_policy_attachment.cluster', 'aws_iam_role_policy_attachment.node',
     'aws_eks_access_entry.admin', 'aws_eks_access_policy_association.admin',
     'aws_eks_addon.networking', 'aws_eks_addon.runtime'
 )
 
 Assert-PlanCondition ($oneactionPlan.terraform_version -eq '1.5.7') 'Validate the team-pinned Terraform 1.5.7 plan.'
-Assert-PlanCondition ((@($oneactionPlan.configuration.provider_config.aws.expressions.allowed_account_ids.constant_value) -join ',') -eq '123456789012') 'Provider writes must be restricted to the team account.'
+Assert-PlanCondition ((@($oneactionPlan.configuration.provider_config.aws.expressions.allowed_account_ids.constant_value) -join ',') -eq '974402993422') 'Provider writes must be restricted to the team account.'
 Assert-PlanCondition ($oneactionPlan.variables.aws_region.value -eq 'ap-northeast-2') 'Use the Seoul workload Region.'
 Assert-PlanCondition ($null -eq $oneactionPlan.configuration.root_module.module_calls) 'Unexpected child module must be reviewed.'
 foreach ($resource in $oneactionPlan.resource_changes) {
@@ -57,7 +56,7 @@ foreach ($resource in $oneactionPlan.resource_changes) {
 foreach ($stackName in @('network', 'observability')) {
     $state = @($oneactionPlan.prior_state.values.root_module.resources | Where-Object address -EQ "data.terraform_remote_state.$stackName")
     Assert-PlanCondition ($state.Count -eq 1) "Missing refreshed $stackName state."
-    Assert-PlanCondition ($state[0].values.config.key -eq "dev/$stackName/terraform.tfstate" -and $state[0].values.config.bucket -eq 'oneaction-tfstate-123456789012' -and $state[0].values.config.region -eq 'ap-northeast-2') "Wrong remote state configuration for $stackName."
+    Assert-PlanCondition ($state[0].values.config.key -eq "dev/$stackName/terraform.tfstate" -and $state[0].values.config.bucket -eq 'oneaction-tfstate-974402993422' -and $state[0].values.config.region -eq 'ap-northeast-2') "Wrong remote state configuration for $stackName."
 }
 
 $cluster = Get-PlannedResource 'aws_eks_cluster.this'
@@ -102,16 +101,18 @@ foreach ($addon in $addons) {
     Assert-PlanCondition (-not [string]::IsNullOrWhiteSpace($addon.change.after.addon_version)) "Pin a resolved version for $($addon.address)."
     Assert-PlanCondition ($addon.change.after.resolve_conflicts_on_create -eq 'NONE') 'Do not overwrite unmanaged add-ons on create.'
 }
-$cniConfig = Get-ConfiguredResource 'aws_eks_addon.networking'
-Assert-PlanCondition (@($cniConfig.expressions.service_account_role_arn.references) -contains 'aws_iam_role.cni.arn') 'CNI must use its separate IAM role.'
+# 팀 계정은 OIDC 공급자를 만들 수 없어(IRSA 불가) vpc-cni 는 노드 역할의 AmazonEKS_CNI_Policy 로 동작한다.
 $nodePolicies = @($oneactionPlan.resource_changes | Where-Object { $_.address -match '^aws_iam_role_policy_attachment\.node\[' })
-Assert-PlanCondition (@($nodePolicies.change.after.policy_arn | Where-Object { $_ -match 'AmazonEKS_CNI_Policy|AdministratorAccess' }).Count -eq 0) 'Node role must not receive CNI or administrator policy.'
-Assert-PlanCondition (@(Compare-Object @($nodePolicies.change.after.policy_arn) @('arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy', 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly')).Count -eq 0) 'Node role requires exactly the reviewed worker and image-pull policies.'
+Assert-PlanCondition (@($nodePolicies.change.after.policy_arn | Where-Object { $_ -match 'AdministratorAccess' }).Count -eq 0) 'Node role must not receive administrator policy.'
+Assert-PlanCondition (@(Compare-Object @($nodePolicies.change.after.policy_arn) @('arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy', 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly', 'arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy')).Count -eq 0) 'Node role requires exactly the reviewed worker, image-pull and CNI policies.'
+foreach ($role in @($oneactionPlan.resource_changes | Where-Object { $_.type -eq 'aws_iam_role' })) {
+    Assert-PlanCondition ($role.change.after.name -like 'ghost-*' -and $role.change.after.permissions_boundary -eq 'arn:aws:iam::974402993422:policy/GhostWorkloadBoundary') "$($role.address) must use the ghost- name and GhostWorkloadBoundary."
+}
 
 $admins = @($oneactionPlan.resource_changes | Where-Object { $_.type -eq 'aws_eks_access_entry' -and $_.mode -eq 'managed' })
 Assert-PlanCondition ($admins.Count -gt 0) 'At least one explicit administrator entry is required.'
 foreach ($admin in $admins) {
-    Assert-PlanCondition ($admin.change.after.principal_arn -match '^arn:aws:iam::123456789012:role/') 'Use stable team IAM role ARNs, not STS sessions.'
+    Assert-PlanCondition ($admin.change.after.principal_arn -match '^arn:aws:iam::974402993422:role/') 'Use stable team IAM role ARNs, not STS sessions.'
 }
 Assert-PlanCondition ($oneactionPlan.planned_values.outputs.eks_log_group_name.value -eq '/aws/eks/oneaction/cluster') 'Reuse the observability-owned log group.'
 

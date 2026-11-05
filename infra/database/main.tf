@@ -14,7 +14,7 @@ provider "aws" {
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
-    bucket         = "oneaction-tfstate-123456789012"
+    bucket         = "oneaction-tfstate-974402993422"
     key            = "dev/network/terraform.tfstate"
     region         = var.aws_region
     dynamodb_table = "oneaction-terraform-locks"
@@ -35,6 +35,15 @@ resource "aws_db_parameter_group" "postgres16" {
 
   parameter {
     name         = "rds.force_ssl"
+    value        = "1"
+    apply_method = "pending-reboot"
+  }
+
+  # AWS → 온프렘 귀환 때 RDS 가 Debezium CDC 원본이 된다 (Hackathon 레포 migration/, 귀환 설정 config.return).
+  # 켜면 wal_level=logical. 정적 파라미터라 이미 떠 있는 인스턴스는 재부팅해야 반영되므로 처음 만들 때 넣는다.
+  # CDC 사용자는 ALTER ROLE ... REPLICATION 대신 rds_replication 멤버십으로 권한을 받는다.
+  parameter {
+    name         = "rds.logical_replication"
     value        = "1"
     apply_method = "pending-reboot"
   }

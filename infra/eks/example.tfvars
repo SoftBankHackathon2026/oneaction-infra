@@ -1,7 +1,7 @@
 # Copy to local.auto.tfvars (ignored by Git) and replace both examples.
 public_access_cidrs = ["203.0.113.10/32"]
 admin_principal_arns = [
-  "arn:aws:iam::123456789012:role/REPLACE_WITH_APPROVED_IAM_ROLE_PATH",
+  "arn:aws:iam::974402993422:role/REPLACE_WITH_APPROVED_IAM_ROLE_PATH",
 ]
 
 # Retain the same Owner convention as existing stacks, or set the agreed owner.

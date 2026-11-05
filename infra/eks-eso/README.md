@@ -8,10 +8,10 @@
 
 | 항목 | 값 |
 | --- | --- |
-| 계정 / 작업 리전 / 클러스터 | `123456789012` / `ap-northeast-2` / `oneaction` |
+| 계정 / 작업 리전 / 클러스터 | `974402993422` / `ap-northeast-2` / `oneaction` |
 | Terraform 상태 | `dev/eks-eso/terraform.tfstate` |
 | 참조 상태 | `dev/eks/terraform.tfstate`, `dev/database/terraform.tfstate` |
-| IAM 역할 / 인라인 정책 | `oneaction-external-secrets` / `read-review-db-secret`, `read-gitops-token-secret`, `read-review-service-secret` |
+| IAM 역할 / 인라인 정책 | `ghost-oneaction-external-secrets` / `read-review-db-secret`, `read-gitops-token-secret`, `read-review-service-secret` |
 | Pod Identity ServiceAccount | `external-secrets/external-secrets` |
 | ESO Helm release | `external-secrets/external-secrets` |
 | Chart / image | `2.12.0` / `ghcr.io/external-secrets/external-secrets:v2.12.0` |
@@ -35,7 +35,7 @@
 
 IAM trust는 `pods.eks.amazonaws.com`의 `sts:AssumeRole`, `sts:TagSession`과 아래 세 [요청 세션 태그](https://docs.aws.amazon.com/eks/latest/userguide/pod-id-abac.html)를 정확히 제한합니다.
 
-- 클러스터 ARN: `arn:aws:eks:ap-northeast-2:123456789012:cluster/oneaction`
+- 클러스터 ARN: `arn:aws:eks:ap-northeast-2:974402993422:cluster/oneaction`
 - namespace: `external-secrets`
 - ServiceAccount: `external-secrets`
 
@@ -72,8 +72,8 @@ if ($LASTEXITCODE -ne 0) { throw 'plan JSON 조회 실패' }
 python -m venv infra/eks-eso/.venv
 $python = (Resolve-Path infra/eks-eso/.venv/Scripts/python.exe).Path
 & $python -m pip install -r infra/eks-eso/requirements-dev.txt
-$gitopsSecretArn = 'arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/gitops-token-AbCdEf'
-$reviewSecretArn = 'arn:aws:secretsmanager:ap-northeast-2:123456789012:secret:oneaction/review-service-GhIjKl'
+$gitopsSecretArn = 'arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/gitops-token-AbCdEf'
+$reviewSecretArn = 'arn:aws:secretsmanager:ap-northeast-2:974402993422:secret:oneaction/review-service-GhIjKl'
 & $python infra/eks-eso/scripts/check_plan.py infra/eks-eso/eso.tfplan.json --gitops-token-secret-arn $gitopsSecretArn --review-service-secret-arn $reviewSecretArn --negative
 if ($LASTEXITCODE -ne 0) { throw '계획 안전성 검사 실패' }
 $artifacts = Join-Path (Get-Location) 'infra/eks-eso/artifacts'
@@ -135,7 +135,7 @@ ESO release와 동기화 manifest는 현재 인프라 작업에서 관리합니�
 | 항목 | 값 |
 | --- | --- |
 | 새 release / ServiceAccount | `external-secrets/external-secrets-argocd` |
-| IAM 역할 | `oneaction-external-secrets-argocd` |
+| IAM 역할 | `ghost-oneaction-external-secrets-argocd` |
 | AWS 읽기 범위 | 지정 `oneaction/review-service` Secret ARN 하나, `GetSecretValue`·`DescribeSecret`, 서울 리전 |
 | Kubernetes 읽기·쓰기 범위 | `argocd`의 ESO 리소스·Secret, 다른 namespace의 Secret 권한 없음 |
 | SecretStore / ExternalSecret | `argocd/review-service` / `argocd/argocd-notifications` |
