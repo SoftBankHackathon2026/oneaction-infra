@@ -1,0 +1,31 @@
+test_install_platform (unittest.loader._FailedTest) ... ERROR
+test_domain_enables_certificate_and_https_redirect (test_render_platform.RenderTests) ... ok
+test_native_ingress_has_neg_and_matches_healthcheck_port (test_render_platform.RenderTests) ... ok
+test_notifications_keep_their_own_identity_and_scope (test_render_platform.RenderTests) ... ok
+test_preserves_existing_review_service_and_notification_contracts (test_render_platform.RenderTests) ... ok
+test_proxy_is_private_and_uses_workload_identity (test_render_platform.RenderTests) ... ok
+test_rejects_wrong_cloud_and_placeholder_project (test_render_platform.RenderTests) ... ok
+test_reuses_aws_values_without_aws_credentials (test_render_platform.RenderTests) ... ok
+test_store_uses_pod_identity_and_keeps_database_secret_contract (test_render_platform.RenderTests) ... ok
+
+======================================================================
+ERROR: test_install_platform (unittest.loader._FailedTest)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_install_platform
+Traceback (most recent call last):
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/loader.py", line 436, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/unittest/loader.py", line 377, in _get_module_from_name
+    __import__(name)
+  File "/private/tmp/oneaction-infra-gcp/tests/test_install_platform.py", line 10, in <module>
+    SPEC.loader.exec_module(installer)
+  File "<frozen importlib._bootstrap_external>", line 846, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 982, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1039, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/oneaction-infra-gcp/scripts/install-gcp-platform.py'
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.009s
+
+FAILED (errors=1)

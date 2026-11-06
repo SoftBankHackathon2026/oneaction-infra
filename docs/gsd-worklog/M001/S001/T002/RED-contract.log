@@ -1,0 +1,24 @@
+test_domain_enables_certificate_and_https_redirect (test_render_platform.RenderTests) ... ok
+test_native_ingress_has_neg_and_matches_healthcheck_port (test_render_platform.RenderTests) ... ok
+test_notifications_keep_their_own_identity_and_scope (test_render_platform.RenderTests) ... ok
+test_preserves_existing_review_service_and_notification_contracts (test_render_platform.RenderTests) ... FAIL
+test_proxy_is_private_and_uses_workload_identity (test_render_platform.RenderTests) ... ok
+test_rejects_wrong_cloud_and_placeholder_project (test_render_platform.RenderTests) ... ok
+test_reuses_aws_values_without_aws_credentials (test_render_platform.RenderTests) ... ok
+test_store_uses_pod_identity_and_keeps_database_secret_contract (test_render_platform.RenderTests) ... ok
+
+======================================================================
+FAIL: test_preserves_existing_review_service_and_notification_contracts (test_render_platform.RenderTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/oneaction-infra-gcp/tests/test_render_platform.py", line 74, in test_preserves_existing_review_service_and_notification_contracts
+    self.assertEqual(service['metadata']['name'], 'platform')
+AssertionError: 'review-service' != 'platform'
+- review-service
++ platform
+
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.009s
+
+FAILED (failures=1)

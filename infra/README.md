@@ -49,3 +49,10 @@ EKS 배포 후 구성은 다음 문서에서 확인합니다.
 - SNS 구독 이메일
 
 현재 ALB는 도메인이 없어 HTTP 80 임시 모드입니다. 실제 도메인과 ACM 인증서가 준비되면 `alb` 스택의 `certificate_arn`, `hosted_zone_id`, `domain_name`을 전달해 HTTPS로 전환합니다.
+
+## GCP 대응 환경
+
+- 기존 AWS 구성은 유지하고 GCP 진입점은 별도로 추가했습니다.
+- [GCP 구성·적용 순서·AWS와의 차이](gcp/README.md)에서 확인합니다.
+- 프로젝트·리전·환경을 변수로 설정하며 상태는 Cloud Storage에 별도로 저장합니다.
+- 실제 클라우드 적용과 데이터 이전은 수행하지 않았습니다.

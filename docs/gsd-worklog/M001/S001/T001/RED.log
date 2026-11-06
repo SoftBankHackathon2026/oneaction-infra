@@ -1,0 +1,80 @@
+tests/parity.tftest.hcl... in progress
+  run "default_parity"... fail
+
+Warning: Value for undeclared variable
+
+  on tests/parity.tftest.hcl line 6, in run "default_parity":
+   6:     project_id = "oneaction-test-123"
+
+The module under test does not declare a variable named "project_id", but it
+is declared in run block "default_parity".
+
+(and 2 more similar warnings elsewhere)
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 11, in run "default_parity":
+  11:     condition = output.platform.cloud == "gcp" && output.platform.region == "asia-northeast3"
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 11, in run "default_parity":
+  11:     condition = output.platform.cloud == "gcp" && output.platform.region == "asia-northeast3"
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 15, in run "default_parity":
+  15:     condition = output.platform.cluster.total_node_count == 3
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 19, in run "default_parity":
+  19:     condition = output.platform.database.public_ip_enabled == false && output.platform.database.ssl_mode == "ENCRYPTED_ONLY"
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 19, in run "default_parity":
+  19:     condition = output.platform.database.public_ip_enabled == false && output.platform.database.ssl_mode == "ENCRYPTED_ONLY"
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 23, in run "default_parity":
+  23:     condition = output.platform.kafka.security_protocol == "SASL_SSL" && output.platform.kafka.sasl_mechanism == "OAUTHBEARER"
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 23, in run "default_parity":
+  23:     condition = output.platform.kafka.security_protocol == "SASL_SSL" && output.platform.kafka.sasl_mechanism == "OAUTHBEARER"
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 27, in run "default_parity":
+  27:     condition = output.platform.load_balancer.domain_name == "" && output.platform.load_balancer.certificate_name == null
+
+An output value with the name "platform" has not been declared.
+
+Error: Reference to undeclared output value
+
+  on tests/parity.tftest.hcl line 27, in run "default_parity":
+  27:     condition = output.platform.load_balancer.domain_name == "" && output.platform.load_balancer.certificate_name == null
+
+An output value with the name "platform" has not been declared.
+
+tests/parity.tftest.hcl... tearing down
+tests/parity.tftest.hcl... fail
+
+Failure! 0 passed, 1 failed.

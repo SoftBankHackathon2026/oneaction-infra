@@ -1,0 +1,21 @@
+tests/parity.tftest.hcl... in progress
+  run "default_parity"... pass
+  run "tokyo_prod_without_kafka"... pass
+  run "with_domain"... pass
+  run "reject_world_open_admin"... pass
+  run "reject_empty_admin_allowlist"... pass
+  run "reject_weak_password"... pass
+  run "reject_invalid_project"... pass
+  run "reject_kafka_memory_ratio"... pass
+tests/parity.tftest.hcl... tearing down
+tests/parity.tftest.hcl... pass
+tests/resources.tftest.hcl... in progress
+  run "private_compute"... pass
+  run "private_database"... pass
+  run "least_privilege_secrets"... pass
+  run "state_bucket"... pass
+  run "load_balancer_errors_are_monitored"... pass
+tests/resources.tftest.hcl... tearing down
+tests/resources.tftest.hcl... pass
+
+Success! 13 passed, 0 failed.

@@ -1,0 +1,21 @@
+# Display name: ghost-project; actual project ID verified in the console.
+# Copy to ghost-project.local.tfvars (ignored by Git).
+# This profile deliberately rejects incomplete full-scope inputs.
+project_id                   = "ghost-project-513812"
+region                       = "asia-northeast3"
+environment                  = "dev"
+require_full_scope           = true
+enable_kafka                 = true
+kafka_vcpu_count             = 4
+kafka_memory_gib             = 4
+enable_tailscale             = true
+node_machine_type            = "e2-custom-2-4096" # Candidate; verify the actual AWS baseline and GKE support.
+node_count_per_zone          = 1
+node_zone_suffixes           = ["a", "b", "c"]
+allow_public_control_plane   = true # User-approved test environment access on 2026-11-05.
+public_access_cidrs           = ["0.0.0.0/0"] # GKE administrator HTTPS access; account authentication still applies.
+admin_members = ["user:nate.crema@gmail.com"] # Explicitly approved cluster administrator.
+domain_name                  = "" # Required. Do not reuse an AWS production hostname.
+notification_email           = "" # Required for full scope.
+tailscale_auth_key_secret_id = "" # Existing secret ID, never the key value.
+# TF_VAR_db_password must be supplied ephemerally at plan/apply time.

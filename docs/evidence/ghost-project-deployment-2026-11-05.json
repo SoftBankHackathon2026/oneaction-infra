@@ -1,0 +1,58 @@
+{
+  "observed_at_utc": "2026-11-05T14:09:29.452433+00:00",
+  "project_id": "ghost-project-513812",
+  "project_display_name": "ghost-project",
+  "project_number": "251118972904",
+  "target_change": "EXPLICIT_USER_INSTRUCTION",
+  "observations": {
+    "project": {
+      "status": "VERIFIED",
+      "source": "https://console.cloud.google.com/welcome?authuser=1&project=ghost-project-513812"
+    },
+    "billing": {
+      "status": "LINKED",
+      "account_display_name": "해커톤 결제",
+      "source": "https://console.cloud.google.com/billing/linkedaccount?authuser=1&project=ghost-project-513812"
+    },
+    "resource_inventory": {
+      "status": "UNVERIFIED",
+      "resources": null
+    },
+    "cloud_shell_auth": {
+      "status": "NO_ACTIVE_ACCOUNT"
+    }
+  },
+  "authorization": {
+    "status": "EXPLICIT_APPROVAL_REQUESTED_AFTER_AUTO_REVIEW_REJECTION",
+    "tool": "Google Cloud SDK",
+    "reason": "Account-level access scope exceeds explicit project-only deployment authorization"
+  },
+  "deployment": {
+    "real_plan_executed": false,
+    "apply_executed": false
+  },
+  "prior_target_evidence": "gcp-deployment-2026-11-05.json",
+  "code": {
+    "repository": "SoftBankHackathon2026/oneaction-infra",
+    "pr_number": 3,
+    "head_sha": "1926fe296ef1d16e0321ab55f0275401c6497103",
+    "draft": true,
+    "state": "OPEN",
+    "pr_target_and_billing_description_verified": true
+  },
+  "checks": {
+    "remote_ci": {
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/SoftBankHackathon2026/oneaction-infra/actions/runs/42042580051",
+      "head_sha": "1926fe296ef1d16e0321ab55f0275401c6497103"
+    }
+  },
+  "unresolved_inputs": [
+    "GCP domain and DNS control",
+    "notification email",
+    "Tailscale existing secret reference and route approval",
+    "operator egress allowlist",
+    "cost ceiling and usage end date"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "project_id": "ghost-project-513812",
+  "cluster": "oneaction-dev",
+  "job": "infra-sql-smoke",
+  "succeeded": true,
+  "query": "SELECT 1",
+  "result": "1",
+  "connection": "Cloud SQL Auth Proxy with workload identity and private IP",
+  "credential_source": "ExternalSecret review-db-credentials",
+  "secret_value_recorded": false
+}

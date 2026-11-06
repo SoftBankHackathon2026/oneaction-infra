@@ -9,3 +9,10 @@ crash.log
 !example.auto.tfvars
 
 __pycache__/
+
+# Local cloud inputs and generated manifests (may contain infrastructure metadata).
+.venv/
+*.local.hcl
+*.local.tfvars
+*.local.json
+infra/gcp/rendered/

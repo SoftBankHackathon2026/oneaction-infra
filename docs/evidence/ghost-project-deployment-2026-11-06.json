@@ -1,0 +1,121 @@
+{
+  "observed_at_utc": "2026-11-05T15:56:35.792197+00:00",
+  "project_id": "ghost-project-513812",
+  "project_number": "251118972904",
+  "region": "asia-northeast3",
+  "billing_enabled": true,
+  "authorization": {
+    "sdk_consent": "EXPLICITLY_APPROVED_AND_COMPLETED",
+    "service_networking_admin": "EXPLICITLY_APPROVED_AND_GRANTED",
+    "logging_config_writer": "EXPLICITLY_APPROVED_AND_GRANTED",
+    "container_admin": "EXPLICITLY_APPROVED_GRANTED_AND_TERRAFORM_MANAGED",
+    "public_gke_admin_access": "USER_APPROVED_TEST_ENVIRONMENT_0.0.0.0/0"
+  },
+  "bootstrap": {
+    "bucket": "ghost-project-513812-tfstate",
+    "apply": "SUCCEEDED",
+    "replan": "NO_CHANGES",
+    "backend": "gcs",
+    "prefix": "gcp/dev/platform"
+  },
+  "core": {
+    "apply": "SUCCEEDED_AFTER_REPAIR",
+    "final_replan": "NO_CHANGES_EXIT_0",
+    "managed_resource_instances": 62,
+    "count_note": "Includes APIs, IAM and bucket prefix objects; not comparable to 94 AWS declaration blocks.",
+    "gke": {
+      "name": "oneaction-dev",
+      "state": "RUNNING",
+      "ready_nodes": 3,
+      "machine_type": "e2-custom-2-4096",
+      "disk_gib": 20,
+      "version": "1.36.4-gke.2046003",
+      "external_node_ips": false
+    },
+    "database": {
+      "name": "oneaction-dev-review",
+      "state": "RUNNABLE",
+      "version": "POSTGRES_16",
+      "private_ip": "10.20.128.3",
+      "public_ip_enabled": false,
+      "tier": "db-custom-1-3840",
+      "logical_decoding": "on",
+      "backups_enabled": true,
+      "encrypted_select_1": "PASSED",
+      "restore_test": "PENDING"
+    },
+    "database_secret": {
+      "id": "oneaction-dev-a740-review-db",
+      "version": 1,
+      "synchronization": "READY",
+      "value_recorded": false
+    },
+    "kafka": {
+      "name": "oneaction-dev-review",
+      "state": "ACTIVE",
+      "vcpu": 4,
+      "memory_gib": 4,
+      "bootstrap_address": "bootstrap-gq4kkkmhncdiz3an7io8.5b970886.asia-northeast3.managedkafka.s.cloud.goog:9092",
+      "broker_count_verified": 3,
+      "oauth_authentication": "PASSED",
+      "produce_consume": "PASSED",
+      "temporary_topic_replication_factor": 3,
+      "temporary_topic_min_insync_replicas": 2,
+      "temporary_topic_deleted": true,
+      "application_topic_configuration": "PENDING"
+    },
+    "ingress": {
+      "address": "34.149.47.248",
+      "external_http_smoke_status": 200,
+      "temporary_backend_removed": true,
+      "business_app_deployed": false,
+      "https": "PENDING_DOMAIN"
+    },
+    "monitoring": {
+      "policies_created": 4,
+      "log_sink_created": true,
+      "log_bucket_writer_created": true,
+      "email_channel_created": false,
+      "delivery_and_restore_checks": "PENDING"
+    },
+    "external_secrets": {
+      "operator_releases": 2,
+      "database": "READY",
+      "review_service": "PENDING_SECRET_VALUE",
+      "argocd_notifications": "PENDING_SECRET_VALUE_AND_ARGOCD_TARGET"
+    }
+  },
+  "checks": {
+    "terraform_mock_passed": 20,
+    "terraform_mock_failed": 0,
+    "python_previously_passed": 16,
+    "persistent_disk_write_read": "PASSED",
+    "storage_workload_read": "PASSED",
+    "sql_workload_private_encrypted_query": "PASSED",
+    "kafka_auth_produce_consume": "PASSED",
+    "external_ingress_http": "PASSED",
+    "probe_cleanup": "COMPLETED"
+  },
+  "fixes": [
+    "Normalize Kafka subnet project ID to project number",
+    "Use l7_lb_rule for Monitoring while keeping http_load_balancer for Logging",
+    "Do not infer Kafka bootstrap hostname; accept actual clusters describe result"
+  ],
+  "inventory_evidence": "ghost-project-preflight-final-2026-11-06.json",
+  "functional_evidence": [
+    "ghost-project-storage-smoke-2026-11-06.json",
+    "ghost-project-sql-smoke-2026-11-06.json",
+    "ghost-project-cloud-smoke-2026-11-06.json"
+  ],
+  "scope_status": "CORE_DEPLOYED_FULL_AWS_PARITY_INCOMPLETE",
+  "aws_actual_state": "UNVERIFIED",
+  "slack_report": "NOT_POSTED_USER_STOPPED_ADDITIONAL_AUTHENTICATION",
+  "unresolved": [
+    "DNS and certificate domain/ownership, including wildcard parity",
+    "Notification email and delivery verification",
+    "Tailscale secret reference, tailnet and route approval",
+    "Application and GitOps secret values and app deployment",
+    "Budget ceiling and usage end date",
+    "AWS live inventory and remaining parity/negative-access/restore/durability checks"
+  ]
+}

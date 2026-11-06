@@ -1,0 +1,17 @@
+# Copy to softbank-ghost.local.tfvars (ignored by Git).
+# This profile deliberately rejects incomplete full-scope inputs.
+project_id                   = "softbank-ghost"
+region                       = "asia-northeast3"
+environment                  = "dev"
+require_full_scope           = true
+enable_kafka                 = true
+enable_tailscale             = true
+node_machine_type            = "e2-custom-2-4096" # Candidate; verify the actual AWS baseline and GKE support.
+node_count_per_zone          = 1
+node_zone_suffixes           = ["a", "b", "c"]
+public_access_cidrs          = [] # Fill from the actual approved operator/deployer egress addresses.
+admin_members                = [] # Fill only identities approved for cluster administration.
+domain_name                  = "" # Required. Do not reuse an AWS production hostname.
+notification_email           = "" # Required for full scope.
+tailscale_auth_key_secret_id = "" # Existing secret ID, never the key value.
+# TF_VAR_db_password must be supplied ephemerally at plan/apply time.
