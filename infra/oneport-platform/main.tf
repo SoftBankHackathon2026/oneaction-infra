@@ -198,6 +198,14 @@ resource "aws_security_group" "server" {
   }
 
   ingress {
+    description = "SSH with key only (ec2-user)"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.ssh_cidrs
+  }
+
+  ingress {
     description = "HTTPS behind access PIN"
     from_port   = 443
     to_port     = 443

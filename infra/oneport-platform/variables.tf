@@ -44,6 +44,12 @@ variable "acme_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "ssh_cidrs" {
+  description = "SSH(22/tcp) 허용 대역. 서버는 키 로그인만 받고(비밀번호 로그인 꺼짐) 키는 ec2-user 의 authorized_keys 에 등록한다. 관리는 SSM 으로도 된다."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 variable "connection_cidrs" {
   description = "온프렘 환경 연결 중계(브로커 TLS 8443/tcp, WireGuard 51820/udp) 허용 대역."
   type        = list(string)

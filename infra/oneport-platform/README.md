@@ -8,13 +8,14 @@ Oneport 플랫폼(화면·API·수집기)을 돌리는 EC2 한 대와 그 IAM �
 | --- | --- | --- |
 | 인스턴스 | 태그 `Name=oneport-platform`, `project=oneport` | 도쿄(`ap-northeast-1`) 기본 VPC, `t3.small` 온디맨드, AL2023, gp3 20GiB 암호화, IMDSv2 필수 |
 | 고정 IP | 태그 `Name=oneport-platform` | 플랫폼·홈랩 앱 도메인의 A 레코드. `eks` 스택이 API 허용 목록에 더한다 |
-| 보안그룹 | `oneport-platform-sg` | 80(Let's Encrypt·HTTPS 리다이렉트), 443(접속 PIN 뒤 화면), 8443/tcp·51820/udp(온프렘 환경 연결 중계). SSH 는 열지 않고 SSM 으로 관리한다 |
+| 보안그룹 | `oneport-platform-sg` | 80(Let's Encrypt·HTTPS 리다이렉트), 443(접속 PIN 뒤 화면), 8443/tcp·51820/udp(온프렘 환경 연결 중계), 22/tcp(`ssh_cidrs`, 기본 전체). 키 로그인만 받는다(비밀번호 로그인 꺼짐). SSM 으로도 들어간다 |
 | 서버 역할 | `ghost-oneport-platform-ec2` | SSM, 서울 ECR `ghost/oneport-platform-*` 읽기, 비용 화면용 읽기 |
 | 배포 역할 | `ghost-oneport-platform-deploy` | GitHub OIDC 로 Hackathon main 만 맡는다. ECR push, 이 리전의 `project=oneport` 인스턴스에만 SSM 명령 |
 
 서울 계정의 온디맨드 vCPU 한도(8)를 EKS 노드 3대와 Tailscale 라우터가 다 쓰고 있어서, 한도가 따로 매겨지는 도쿄에 둡니다. 홈랩까지는 Tailscale 로 40ms 안팎입니다.
 
 - 역할은 팀 규칙대로 이름이 `ghost-`로 시작하고 권한 경계 `GhostWorkloadBoundary`를 붙입니다.
+- SSH 는 키 페어 없이 만든 서버라서 `ec2-user` 의 `authorized_keys` 에 공개키를 넣어서 쓴다(처음에는 SSM 으로 넣었다). 키가 유출되면 서버가 열리므로, 쓰지 않게 되면 `ssh_cidrs` 를 비워서 닫는다. 관리 PC 대역으로 좁히려면 `ssh_cidrs` 에 그 대역을 넣는다.
 - IAM 태그 키는 대소문자를 구분하지 않아 기본 태그 `Project`와 `project`가 부딪힙니다. `project=oneport`는 EC2 자원에만 붙입니다. CD 의 SSM 권한이 인스턴스의 이 태그로 대상을 좁힙니다.
 - 인스턴스의 `ami`, `user_data`는 처음 만들 때만 쓰여서 이후 변경을 무시합니다. 부팅 스크립트는 Hackathon 저장소 `platform/deploy/ec2/user-data.sh`입니다.
 
