@@ -43,3 +43,9 @@ variable "deletion_protection" {
   type = bool
 
 }
+
+variable "enable_proxy_public_ip" {
+  type        = bool
+  default     = false
+  description = "Enable public address for authenticated Cloud SQL Auth Proxy from AWS; no authorized_networks are added."
+}

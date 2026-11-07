@@ -57,19 +57,20 @@ module "gke" {
 }
 
 module "database" {
-  source                = "./database"
-  project_id            = var.project_id
-  region                = var.region
-  name                  = local.name
-  labels                = local.labels
-  network_id            = module.network.network_id
-  service_connection_id = module.network.service_connection_id
-  tier                  = var.db_tier
-  password              = var.db_password
-  password_version      = var.db_password_version
-  high_availability     = var.db_high_availability
-  deletion_protection   = var.deletion_protection
-  depends_on            = [google_project_service.required]
+  enable_proxy_public_ip = var.db_enable_proxy_public_ip
+  source                 = "./database"
+  project_id             = var.project_id
+  region                 = var.region
+  name                   = local.name
+  labels                 = local.labels
+  network_id             = module.network.network_id
+  service_connection_id  = module.network.service_connection_id
+  tier                   = var.db_tier
+  password               = var.db_password
+  password_version       = var.db_password_version
+  high_availability      = var.db_high_availability
+  deletion_protection    = var.deletion_protection
+  depends_on             = [google_project_service.required]
 }
 
 module "load_balancer" {
