@@ -203,3 +203,9 @@ variable "kafka_bootstrap_brokers" {
     error_message = "Use the actual Kafka bootstrap hostname followed by :9092."
   }
 }
+
+variable "db_enable_proxy_public_ip" {
+  type        = bool
+  default     = false
+  description = "Opt in to AWS-to-Cloud SQL Auth Proxy connectivity without a cross-cloud private route."
+}

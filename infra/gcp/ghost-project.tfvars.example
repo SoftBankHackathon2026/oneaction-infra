@@ -19,3 +19,7 @@ domain_name                  = "" # Required. Do not reuse an AWS production hos
 notification_email           = "" # Required for full scope.
 tailscale_auth_key_secret_id = "" # Existing secret ID, never the key value.
 # TF_VAR_db_password must be supplied ephemerally at plan/apply time.
+
+# AWS-hosted Cloud SQL Auth Proxy uses the public address with IAM + TLS.
+# No authorized_networks / 0.0.0.0/0 database allowlist is created.
+db_enable_proxy_public_ip = true

@@ -14,7 +14,7 @@ resource "google_sql_database_instance" "this" {
     deletion_protection_enabled = var.deletion_protection
     user_labels                 = var.labels
     ip_configuration {
-      ipv4_enabled    = false
+      ipv4_enabled    = var.enable_proxy_public_ip
       private_network = var.network_id
       ssl_mode        = "ENCRYPTED_ONLY"
     }
