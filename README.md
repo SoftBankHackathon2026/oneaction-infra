@@ -44,6 +44,7 @@ flowchart LR
 | 9 | [`eks-eso`](infra/eks-eso) | External Secrets Operator용 Pod Identity, Secret별 최소 읽기 정책 |
 | 10 | [`msk`](infra/msk) | MSK Kafka 클러스터(`kafka.t3.small` × 2), EKS 서브넷에서만 허용하는 보안그룹 |
 | 11 | [`tailscale`](infra/tailscale) | Tailscale 서브넷 라우터(`t4g.micro`, EKS private 서브넷). 온프렘 k3s 가 tailnet 으로 RDS·MSK 에 닿는 경로 |
+| 12 | [`oneport-platform`](infra/oneport-platform) | Oneport 플랫폼 서버(도쿄 `t3.small`, 고정 IP, 보안그룹)와 서버·배포 IAM 역할. `eks`가 이 스택의 고정 IP를 API 허용 목록에 더한다 |
 
 ## 설계 포인트
 

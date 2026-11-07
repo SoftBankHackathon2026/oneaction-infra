@@ -40,6 +40,14 @@ data "terraform_remote_state" "observability" {
   config  = merge(local.remote_state_config, { key = "dev/observability/terraform.tfstate" })
 }
 
+# 도쿄 플랫폼 서버(oneport-platform 스택)의 고정 IP. 수집기가 EKS 공개 엔드포인트로 읽으므로 허용 목록에 더한다.
+# 그 스택 상태가 없으면 빈 목록이다.
+data "terraform_remote_state" "oneport_platform" {
+  backend  = "s3"
+  config   = merge(local.remote_state_config, { key = "dev/oneport-platform/terraform.tfstate" })
+  defaults = { eks_public_access_cidrs = [] }
+}
+
 data "aws_subnet" "eks" {
   for_each = toset(data.terraform_remote_state.network.outputs.private_eks_subnet_ids)
   id       = each.value

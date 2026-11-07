@@ -18,7 +18,7 @@ resource "aws_eks_cluster" "this" {
     subnet_ids              = data.terraform_remote_state.network.outputs.private_eks_subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
-    public_access_cidrs     = sort(tolist(var.public_access_cidrs))
+    public_access_cidrs     = sort(tolist(setunion(var.public_access_cidrs, data.terraform_remote_state.oneport_platform.outputs.eks_public_access_cidrs)))
   }
 
   lifecycle {
